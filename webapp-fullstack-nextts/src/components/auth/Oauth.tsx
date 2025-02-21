@@ -3,11 +3,19 @@ import React from "react"
 import { Github, Twitter } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { signIn } from "next-auth/react"
+import { toast } from "sonner"
 
 const Oauth = React.memo((): React.JSX.Element => {
+    const handleGit = async () => {
+        try {
+            await signIn("github")
+        } catch (error) {
+            toast("Error when try to login with github")
+        }
 
+    }
     return <>
-        <Button onClick={() => signIn("github")} variant="outline" className="w-full">
+        <Button onClick={handleGit} variant="outline" className="w-full">
             <Github width={24} className="text-black font-bold border-border border-2 size-six block p-1 max-w-none max-h-none rounded-full"></Github>
             Login with Github
         </Button>

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Plus_Jakarta_Sans } from 'next/font/google'
 import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]/route";
 import SessionProvider from "@/components/app/SessionProvider";
+import { authOptions } from "@/lib/authOption";
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   display: 'swap',

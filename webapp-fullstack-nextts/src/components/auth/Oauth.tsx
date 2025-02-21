@@ -1,18 +1,17 @@
 'use client'
 import React from "react"
-import { Github } from "lucide-react"
+import { Github, Twitter } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { signIn } from "next-auth/react"
 
 const Oauth = React.memo((): React.JSX.Element => {
-    const handleGoogle = () => {
-        signIn('google')
-    }
+
     return <>
-        <Button variant="outline" className="w-full">
+        <Button onClick={() => signIn("github")} variant="outline" className="w-full">
             <Github width={24} className="text-black font-bold border-border border-2 size-six block p-1 max-w-none max-h-none rounded-full"></Github>
             Login with Github
         </Button>
+        {/* Im not own debit card, cant register this
         <Button onClick={handleGoogle} variant="outline" className="w-full">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path
@@ -21,6 +20,10 @@ const Oauth = React.memo((): React.JSX.Element => {
                 />
             </svg>
             Login with Google
+        </Button> */}
+        <Button onClick={() => signIn("twitter")} variant="outline" className="w-full">
+            <Twitter width={24} className="text-black font-bold border-border border-2 size-six block p-1 max-w-none max-h-none rounded-full"></Twitter>
+            Login with Twitter
         </Button>
     </>
 })

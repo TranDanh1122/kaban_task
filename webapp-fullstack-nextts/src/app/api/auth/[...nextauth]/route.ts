@@ -3,23 +3,37 @@ import NextAuth, { Session, AuthOptions } from "next-auth"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { JWT } from "next-auth/jwt"
-import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
+import TwitterProvider from "next-auth/providers/twitter";
 
 export const authOptions: AuthOptions = {
-    pages: {
-        signIn: 'login'
-    },
     debug: true,
     providers: [
-        GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-            async profile(profile) {
+        GitHubProvider({
+            clientId: process.env.GITHUB_ID!,
+            clientSecret: process.env.GITHUB_SECRET!,
+            profile(profile) {
                 return {
-                    id: profile.sub,
+                    id: profile.id.toString(),
+                    name: profile.name ?? profile.login,
+                    email: profile.email,
+                    avatar: profile.avatar_url,
+                }
+            },
+        }),
+        TwitterProvider({
+            clientId: process.env.TWITTER_CLIENT_ID!,
+            clientSecret: process.env.TWITTER_CLIENT_SECRET!,
+            version: "2.0",
+            profile(profile) {
+                return {
+                    id: profile.id_str,
                     name: profile.name,
                     email: profile.email,
-                    image: profile.picture,
+                    avatar: profile.profile_image_url_https.replace(
+                        /_normal\.(jpg|png|gif)$/,
+                        ".$1"
+                    ),
                 }
             }
         }),

@@ -4,6 +4,7 @@ import { Plus_Jakarta_Sans } from 'next/font/google'
 import { getServerSession } from "next-auth";
 import SessionProvider from "@/components/app/SessionProvider";
 import { authOptions } from "@/lib/authOption";
+import { Toaster } from "@/components/ui/sonner";
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   display: 'swap',
@@ -25,6 +26,8 @@ export default async function RootLayout({
       <html lang="en">
         <body className={`${jakarta.className} antialiased tracking-wider`}>
           {children}
+          <Toaster />
+
         </body>
       </html>
     </SessionProvider>

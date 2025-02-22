@@ -9,7 +9,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import Oauth from "./Oauth"
-
+import { AxiosClient } from "@/lib/axios-client"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import React from "react"
 const formSchema = z.object({
     email: z.string().min(2, {
         message: "Email is too short",
@@ -34,8 +37,23 @@ export function RegisterForm({
             name: ""
         },
     })
+    const router = useRouter()
+    const [loading, isLoading] = React.useState<boolean>(false)
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         console.log(data);
+        try {
+            isLoading(true)
+            const response = await AxiosClient.post(`${process.env.NEXT_PUBLIC_API_URL}/user`, data)
+            if (response.status === 200) {
+                router.push("/login")
+            }
+        } catch (error: any) {
+            toast.error(`Error: ${error.response?.data?.message}`, {
+                style: { color: "red" }
+            })
+        } finally {
+            isLoading(false)
+        }
     }
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -98,7 +116,10 @@ export function RegisterForm({
                                         </FormItem>
                                     )}
                                 />
-                                <Button className="flex mx-auto" type="submit">Register</Button>
+                                <Button disabled={loading} className="flex mx-auto" type="submit">
+                                    {!loading && "Register"}
+                                    {loading && <div className="w-5 h-5 border-white border-t-2 border-r-2 rounded-full animate-spin"></div>}
+                                </Button>
                             </form>
                         </Form>
                         <div className="text-center text-sm">

@@ -7,8 +7,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useDialog } from "@/hooks/use-dialog";
 import CreateBoardForm from "@/components/app/Board/create-form";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Button } from "../ui/button"
 const queryClient = new QueryClient();
-
 interface Props {
     children: React.ReactNode
 }
@@ -21,9 +21,10 @@ const Layout = ({ children }: Props): React.JSX.Element => {
                 <AppSidebar />
                 <SidebarInset>
                     <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-                        <div className="flex items-center gap-2 px-4">
+                        <div className="flex items-center gap-2 px-4  w-full">
                             <SidebarTrigger className="-ml-1" />
                             <Separator orientation="vertical" className="mr-2 h-4" />
+                            <span className="heading-xl">Platform Launch</span>
                         </div>
                     </header>
                     <ScrollArea className="max-h-[calc(100vh-64px)]">
@@ -32,7 +33,6 @@ const Layout = ({ children }: Props): React.JSX.Element => {
                 </SidebarInset>
             </SidebarProvider>
             {isOpen("BoardForm") && <CreateBoardForm />}
-
         </QueryClientProvider>
 
     </>

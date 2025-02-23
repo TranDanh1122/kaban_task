@@ -20,60 +20,63 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { usePathname } from "next/navigation"
+import { useDialog } from "@/hooks/use-dialog"
+import { useSession } from "next-auth/react"
+import useFetchBoard from "@/hooks/use-fetch-board"
 
 
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathName = usePathname()
-  const data = React.useMemo(() => ({
-    user: {
-      name: "shadcn",
-      email: "m@example.com",
-      avatar: "/avatars/shadcn.jpg",
-    },
-    navMain: [
-      {
-        title: "Platform Launch",
-        url: "/",
-        icon: SquareTerminal,
-        isActive: pathName === "/",
-      },
-      {
-        title: "Marketing Plan",
-        url: "/marketing-plan",
-        icon: Bot,
-        isActive: pathName === "marketing-plan",
-      },
-      {
-        title: "Roadmap",
-        url: "/roadmap",
+  const { dispatch } = useDialog()
+  const { data: session } = useSession()
+  const { boards } = useFetchBoard()
+
+  const data = React.useMemo(() => {
+    const boardItems = boards?.map((el: Board) => {
+      return {
+        title: el.title,
+        url: `/${el.slug}`,
         icon: BookOpen,
-        isActive: pathName === "roadmap",
+        isActive: pathName === el.slug,
 
+      }
+    }) || []
+    return {
+      user: {
+        name: session?.user.name,
+        email: session?.user.email,
+        avatar: session?.user.avatar ?? "/avatars/shadcn.jpg",
       },
-      {
-        title: "Create New Plan",
-        url: "#",
-        icon: PlusCircleIcon,
-      },
-      {
-        title: "Settings",
-        url: "#",
-        icon: Settings2,
-        items: [
-          {
-            title: "Change Font",
-            url: "#",
-          },
-          {
-            title: "Change Theme",
-            url: "#",
-          },
-        ]
-      },
-    ],
+      navMain: [
+        ...boardItems,
+        {
+          title: "Create New Plan",
+          url: "#",
+          icon: PlusCircleIcon,
+          action: () => dispatch({
+            type: "TOOGLE", payload: { name: "BoardForm", state: true }
+          })
+        },
+        {
+          title: "Settings",
+          url: "#",
+          icon: Settings2,
+          items: [
+            {
+              title: "Change Font",
+              url: "#",
+            },
+            {
+              title: "Change Theme",
+              url: "#",
+            },
+          ]
+        },
+      ],
 
-  }), [pathName])
+    }
+  }, [pathName, boards])
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>

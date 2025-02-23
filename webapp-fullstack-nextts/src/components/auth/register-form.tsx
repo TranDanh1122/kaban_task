@@ -40,7 +40,6 @@ export function RegisterForm({
     const router = useRouter()
     const [loading, isLoading] = React.useState<boolean>(false)
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        console.log(data);
         try {
             isLoading(true)
             const response = await AxiosClient.post(`${process.env.NEXT_PUBLIC_API_URL}/user`, data)

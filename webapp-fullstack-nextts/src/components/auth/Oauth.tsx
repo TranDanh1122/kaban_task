@@ -10,7 +10,6 @@ const Oauth = React.memo((): React.JSX.Element => {
         try {
             await signIn("github")
         } catch (error) {
-            console.log(error);
             toast("Error when try to login with github")
         }
 

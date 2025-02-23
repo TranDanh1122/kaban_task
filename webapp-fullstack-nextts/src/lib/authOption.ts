@@ -47,7 +47,6 @@ export const authOptions: NextAuthOptions = {
                 password: { label: "Password", type: "password", placeholder: "Password" }
             },
             async authorize(credentials) {
-                console.log(credentials);
 
                 if (!credentials) return null
                 if (!credentials.email || !credentials.password) return null
@@ -69,7 +68,6 @@ export const authOptions: NextAuthOptions = {
                         avatar: user.avatar
                     }
                 } catch (e) {
-                    console.log("Lỗi đăng nhập", e)
                     return null
 
                 }

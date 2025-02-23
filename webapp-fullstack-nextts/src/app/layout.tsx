@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import SessionProvider from "@/components/app/SessionProvider";
 import { authOptions } from "@/lib/authOption";
 import { Toaster } from "@/components/ui/sonner";
+import DialogContextProvider from "@/context/DialogContext";
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   display: 'swap',
@@ -22,15 +23,18 @@ export default async function RootLayout({
 }>) {
   const session = await getServerSession(authOptions);
   return (
-    <SessionProvider session={session} >
-      <html lang="en">
-        <body className={`${jakarta.className} antialiased tracking-wider`}>
-          {children}
-          <Toaster />
+    <DialogContextProvider>
+      <SessionProvider session={session} >
+        <html lang="en">
+          <body className={`${jakarta.className} antialiased tracking-wider`}>
+            {children}
+            <Toaster />
 
-        </body>
-      </html>
-    </SessionProvider>
+          </body>
+        </html>
+      </SessionProvider>
+    </DialogContextProvider>
+
 
   );
 }

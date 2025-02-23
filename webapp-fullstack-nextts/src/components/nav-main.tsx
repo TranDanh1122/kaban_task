@@ -2,22 +2,10 @@
 
 import { ChevronRight, type LucideIcon } from "lucide-react"
 
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-import {
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from "@/components/ui/sidebar"
 import Link from "next/link"
+import useFetchBoard from "@/hooks/use-fetch-board"
 
 export function NavMain({
   items,
@@ -27,15 +15,19 @@ export function NavMain({
     url: string
     icon?: LucideIcon
     isActive?: boolean
+    action?: () => void
     items?: {
       title: string
-      url: string
+      url: string,
+      action?: () => void
     }[]
   }[]
 }) {
+  const { boards } = useFetchBoard()
+
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>All board (0)</SidebarGroupLabel>
+      <SidebarGroupLabel>All board ({boards?.length || 0})</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible
@@ -52,7 +44,7 @@ export function NavMain({
                   </Link>}
                   {item.url == "#" && <>
                     {item.icon && <item.icon />}
-                    <span>{item.title}</span>
+                    <span className="w-full" onClick={item.action}>{item.title}</span>
                     {
                       item.items && item.items.length > 0 &&
                       <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
@@ -67,9 +59,18 @@ export function NavMain({
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
-                        <a href={subItem.url}>
-                          <span>{subItem.title}</span>
-                        </a>
+                        <>
+                          {item.url != "#" &&
+                            <Link href={subItem.url}>
+                              <span className="text-sm">{subItem.title}</span>
+                            </Link>
+                          }
+                          {item.url == "#" &&
+                            <span onClick={() => item.action?.()}>
+                              <span className="text-sm">{subItem.title}</span>
+                            </span>
+                          }
+                        </>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}

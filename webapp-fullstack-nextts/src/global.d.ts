@@ -17,6 +17,7 @@ declare global {
     interface Board {
         id: string,
         title: string
+        slug: string
     }
 
     interface User {

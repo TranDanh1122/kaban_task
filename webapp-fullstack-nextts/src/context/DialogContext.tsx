@@ -9,7 +9,8 @@ interface Dialog {
 const initData: Dialog[] = [
     { name: "BoardForm", status: false },
     { name: "TaskForm", status: false },
-    { name: "TaskView", status: false }
+    { name: "TaskView", status: false },
+    { name: "ConfirmDialog", status: false }
 ]
 const reducer = (state: Dialog[], action: action) => {
     switch (action.type) {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
-const PUBLIC_ROUTES = ["/login", "/register", "/api/auth", "/api/user/public"];
+const PUBLIC_ROUTES = ["/login", "/register", "/api/auth", "/api/user"];
 const STATIC_FILES = /\.(css|js|png|jpg|jpeg|svg|ico|woff2|woff|ttf)$/;
 export async function middleware(req: NextRequest) {
     let token = null;

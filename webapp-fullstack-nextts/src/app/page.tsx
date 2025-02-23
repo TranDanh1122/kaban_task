@@ -5,7 +5,7 @@ import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query
 export default async function Home() {
   const queryClient = new QueryClient()
   await queryClient.prefetchQuery({
-    queryKey: ['board'],
+    queryKey: ['boards'],
     queryFn: async () => {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/board`)
       if (!res.ok) throw new Error("Fail to load")

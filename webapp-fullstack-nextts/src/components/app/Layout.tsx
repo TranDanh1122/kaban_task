@@ -28,7 +28,7 @@ const Layout = ({ children }: Props): React.JSX.Element => {
                         }
                         {
                             !isLoading &&
-                            <span className="heading-xl">{boards?.find((el: Board) => el.slug == page).title || "Dashboard"}</span>
+                            <span className="heading-xl">{boards?.find((el: Board) => el.slug == page)?.title || "Dashboard"}</span>
                         }
                     </div>
                 </header>

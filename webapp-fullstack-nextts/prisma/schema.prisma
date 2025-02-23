@@ -29,12 +29,15 @@ model Status {
 }
 
 model Board {
-    id     String   @id @default(cuid())
-    title  String
-    slug   String
-    author User?    @relation(fields: [userId], references: [id])
-    userId String?
-    Status Status[]
+    id        String   @id @default(cuid())
+    title     String
+    slug      String
+    isArchive Boolean  @default(false)
+    author    User?    @relation(fields: [userId], references: [id])
+    userId    String?
+    Status    Status[]
+
+    @@unique([slug, userId])
 }
 
 model User {

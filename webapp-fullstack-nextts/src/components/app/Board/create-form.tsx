@@ -8,10 +8,9 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useDialog } from "@/hooks/use-dialog"
-import {  XIcon } from "lucide-react"
-import { toast } from "sonner"
-import { AxiosClient } from "@/lib/axios-client"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { XIcon } from "lucide-react"
+import useFetchBoard, { useCreateBoard } from "@/hooks/use-fetch-board"
+import { createSlug } from "@/lib/createSlug"
 interface Props {
     board?: Board,
 }
@@ -25,34 +24,7 @@ const formSchema = z.object({
     ).min(1, "At least one column is required"),
     icon: z.string({ message: "Please chose icon" }),
 })
-const useCreateBoard = () => {
-    const queryClient = useQueryClient()
-    const { dispatch } = useDialog();
 
-    return useMutation({
-        mutationFn: async (data: z.infer<typeof formSchema>) => {
-            const res = await AxiosClient.post(`${process.env.NEXT_PUBLIC_API_URL}/board`, data)
-            if (res.status !== 200) {
-                throw new Error(res.data.response?.message || "Something went wrong");
-            }
-            return res.data
-        },
-        onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ['boards'] })
-            toast.error(data.message || "Board create success", {
-                style: { color: "green" }
-            })
-            setTimeout(() => {
-                dispatch({ type: "TOOGLE", payload: { name: "BoardForm", state: false } });
-            }, 100);
-        },
-        onError: (error: any) => {
-            toast.error(error.response.data.message || "Error creating board", {
-                style: { color: "red" }
-            });
-        },
-    })
-}
 
 export default function CreateBoardForm({ board }: Props): React.JSX.Element {
     const form = useForm<z.infer<typeof formSchema>>({

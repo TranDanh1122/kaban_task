@@ -9,11 +9,11 @@ export async function POST(req: NextRequest) {
         if (!token) return NextResponse.json({ message: "Unauthorize" }, { status: 401 })
         if (!columns || columns.length <= 0 || !title) return NextResponse.json({ message: "Invalid Data" }, { status: 400 })
         const board = await prisma.board.create({
-            data: { title: title, userId: token?.user?.id ?? "", slug: createSlug(title) }
+            data: { title: title, userId: token?.user?.id ?? "", slug: createSlug(title), Status: { create: columns } }
         })
         if (!board) return NextResponse.json({ message: "Error when create Board" }, { status: 400 })
         return NextResponse.json({ message: "Create A Board Successfully" }, { status: 200 })
-    } catch (error) {        
+    } catch (error) {
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
     }
 }

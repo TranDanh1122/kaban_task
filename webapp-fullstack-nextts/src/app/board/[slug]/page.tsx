@@ -1,8 +1,6 @@
 'use client'
 import React from "react"
 import Layout from "@/components/app/Layout"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { v4 } from 'uuid'
 import { ScrollArea } from "@/components/ui/scroll-area"
 import useFetchStatus from "@/hooks/use-fetch-status"
 import { Button } from "@/components/ui/button"
@@ -10,12 +8,22 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { ListTodo, PencilRuler, Sparkle } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
+import Status, { StatusSkeleton } from "@/components/app/Status/status"
 export default function BoardDetail({ params }: { params: { slug: string } }) {
-    const { columns, isLoading, error } = useFetchStatus(params.slug)
+    const { columns, isLoading, isError } = useFetchStatus(params.slug)
     return <Layout>
         <ScrollArea className="w-full h-screen max-h-[calc(100vh-64px)] bg-primary-100/20 p-6">
-            
-            <Toolbox className="absolute bottom-6 right-6 size-14 p-3 rounded-full bg-primary-300 hover:bg-primary-200 text-primary-100 " />
+            <div className="flex items-start gap-4">
+                { isError && <div className="w-full h-full flex items-center justify-center font-semibold mt-20">Error when loading, please try again later</div> }
+                {isLoading && Array.from({ length: 4 }).map(el => <StatusSkeleton />)}
+                {!isLoading && !isError &&
+                    <>
+                        {columns && columns.map((el: Status) => <Status column={el} />)}
+                        <Toolbox className="absolute bottom-6 right-6 size-14 p-3 rounded-full bg-primary-300 hover:bg-primary-200 text-primary-100 " />
+                    </>
+                }
+            </div>
+
         </ScrollArea>
 
     </Layout>
@@ -44,21 +52,3 @@ const ActionButton = ({ children, action }: { children: React.ReactNode, action:
     </TooltipProvider></>
 }
 Toolbox.displayName = "Toolbox"
-const Status = React.memo((): React.JSX.Element => {
-    return <div className="w-1/4 h-full space-y-5">
-
-        {
-            Array.from({ length: 10 }).map(el => <Task key={v4()} />)
-        }
-    </div>
-})
-Status.displayName = "Status"
-const Task = React.memo((): React.JSX.Element => {
-    return <Card className="cursor-pointer shadow-md">
-        <CardHeader>
-            <CardTitle className="heading-m hover:text-primary-300">Build UI for search</CardTitle>
-            <CardDescription className="text-[12px] font-bold text-secondary-100">0 of 2 substasks</CardDescription>
-        </CardHeader>
-    </Card>
-})
-Task.displayName = "Task"

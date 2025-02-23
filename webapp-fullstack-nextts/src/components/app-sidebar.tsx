@@ -36,14 +36,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       navMain: [
         ...boardItems,
-        {
-          title: "Create New Plan",
-          url: "#",
-          icon: PlusCircleIcon,
-          action: () => dispatch({
-            type: "TOOGLE", payload: { name: "BoardForm", state: true }
-          })
-        }
+        // {
+        //   title: "Create New Plan",
+        //   url: "#",
+        //   icon: PlusCircleIcon,
+        //   action: () => dispatch({
+        //     type: "TOOGLE", payload: { name: "BoardForm", state: true }
+        //   })
+        // }
       ],
 
     }
@@ -54,7 +54,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent className="bg-white">
-        <SidebarGroup>
+        <SidebarGroup className="pb-0">
           <SidebarMenu>
             <SidebarMenuItem >
               <SidebarMenuButton onClick={() => dispatch({

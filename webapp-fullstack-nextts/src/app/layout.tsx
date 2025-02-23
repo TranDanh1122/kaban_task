@@ -6,6 +6,7 @@ import SessionProvider from "@/components/app/SessionProvider";
 import { authOptions } from "@/lib/authOption";
 import { Toaster } from "@/components/ui/sonner";
 import DialogContextProvider from "@/context/DialogContext";
+import QueryClientProvider from "@/components/app/QueryClientProvider";
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   display: 'swap',
@@ -23,18 +24,18 @@ export default async function RootLayout({
 }>) {
   const session = await getServerSession(authOptions);
   return (
-    <DialogContextProvider>
-      <SessionProvider session={session} >
-        <html lang="en">
-          <body className={`${jakarta.className} antialiased tracking-wider`}>
-            {children}
-            <Toaster />
+    <QueryClientProvider>
+      <DialogContextProvider>
+        <SessionProvider session={session} >
+          <html lang="en">
+            <body className={`${jakarta.className} antialiased tracking-wider`}>
+              {children}
+              <Toaster />
 
-          </body>
-        </html>
-      </SessionProvider>
-    </DialogContextProvider>
-
-
+            </body>
+          </html>
+        </SessionProvider>
+      </DialogContextProvider>
+    </QueryClientProvider>
   );
 }

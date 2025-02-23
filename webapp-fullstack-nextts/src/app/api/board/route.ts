@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
         })
         if (!board) return NextResponse.json({ message: "Error when create Board" }, { status: 400 })
         return NextResponse.json({ message: "Create A Board Successfully" }, { status: 200 })
-    } catch (error) {
+    } catch (error) {        
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
     }
 }

@@ -1,12 +1,12 @@
 "use client"
 
 import {
+  Archive,
   BadgeCheck,
   Bell,
   ChevronsUpDown,
   LogOut,
   Settings,
-  Sparkles,
 } from "lucide-react"
 
 import {
@@ -79,8 +79,8 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
+                <Archive />
+                Archived Plan
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

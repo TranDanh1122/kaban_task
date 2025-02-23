@@ -30,9 +30,9 @@ export function NavMain({
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton className={`${item.isActive ? "bg-primary-300 text-white" : ""} 
-                font-medium hover:bg-primary-100 hover:text-primary-300 py-2`} tooltip={item.title}>
+                font-medium hover:bg-primary-100 hover:text-primary-300 py-6`} tooltip={item.title}>
               {item.icon && <item.icon />}
-              <Link href={item.url} className="flex items-center gap-2 w-full h-full">
+              <Link onClick={() => item.action?.()} href={item.url} className="flex items-center gap-2 w-full h-full">
                 <span>{item.title}</span>
               </Link>
             </SidebarMenuButton>

@@ -9,18 +9,20 @@ import { usePathname } from "next/navigation"
 import { useDialog } from "@/hooks/use-dialog"
 import { useSession } from "next-auth/react"
 import useFetchBoard from "@/hooks/use-fetch-board"
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathName = usePathname()
   const { dispatch } = useDialog()
   const { data: session } = useSession()
   const { boards, isLoading } = useFetchBoard()
+
   const boardItems = React.useMemo(() => boards?.map((el: Board) => {
     return {
       title: el.title,
-      url: `/${el.slug}`,
+      url: `/board/${el.slug}`,
       icon: BookOpen,
-      isActive: pathName === el.slug,
+      isActive: pathName.split("/").some(item => item == el.slug),
 
     }
   }) || [], [boards, pathName])
@@ -52,6 +54,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent className="bg-white">
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem >
+              <SidebarMenuButton onClick={() => dispatch({
+                type: "TOOGLE", payload: { name: "BoardForm", state: true }
+              })} className="font-medium hover:bg-primary-100 hover:text-primary-300 py-6" tooltip="Create New Plan">
+                <PlusCircleIcon />
+                Create New Plan
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+          </SidebarMenu>
+        </SidebarGroup>
         {!isLoading && <NavMain items={data.navMain} />}
         {isLoading && <div className="w-5 h-5 border-t-2 border-l-2 animate-spin border-primary-300 rounded-full mx-auto mt-[50%]"></div>}
       </SidebarContent>

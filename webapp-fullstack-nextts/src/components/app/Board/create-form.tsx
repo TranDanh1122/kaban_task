@@ -40,7 +40,7 @@ export default function CreateBoardForm(): React.JSX.Element {
     })
     const createNewBoard = useCreateOrUpdateBoard()
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        createNewBoard.mutate({ ...data, id: board.id ?? "" })
+        createNewBoard.mutate({ ...data, id: board.id ?? "", slug : board.slug ?? "" })
     }
 
     const { fields, append, remove } = useFieldArray({

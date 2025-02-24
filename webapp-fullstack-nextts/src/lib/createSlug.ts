@@ -11,5 +11,5 @@ export function createSlug(name: string, boards: Board[]): string {
         .replace(/đ/g, 'd')
         .replace(/[^a-z0-9\s-]/g, '')
         .trim()
-        .replace(/\s+/g, '-')}${count > 0 ? `_${count}` : ""}`
+        .replace(/\s+/g, '-')}${count > 0 ? `_${count + 1}` : ""}`
 }

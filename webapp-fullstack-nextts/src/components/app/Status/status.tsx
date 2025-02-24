@@ -12,7 +12,7 @@ const Status = React.memo(({ column }: { column: Status }): React.JSX.Element =>
         </div>
         <div className=" space-y-5">
             {
-                Array.from({ length: 10 }).map(el => <Task key={v4()} />)
+                column.Task.map(el => <Task key={el.id} task={el} />)
             }
         </div>
 

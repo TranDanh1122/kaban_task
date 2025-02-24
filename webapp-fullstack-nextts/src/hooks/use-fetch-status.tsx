@@ -5,11 +5,12 @@ import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { toast } from "sonner"
 
-export default function useFetchStatus(boardSlug: string) {
+export default function useFetchStatus(boardID: string) {
+    
     const { data: columns, isLoading, error, isError } = useQuery({
-        queryKey: ["status", boardSlug],
+        queryKey: ["status", boardID],
         queryFn: async () => {
-            const res = await AxiosClient.get(`${process.env.NEXT_PUBLIC_API_URL}/status?boardSlug=${boardSlug}`)
+            const res = await AxiosClient.get(`${process.env.NEXT_PUBLIC_API_URL}/status?boardID=${boardID}`)
             if (res.status != 200) throw new Error("Fail to load")
             return res.data
         },

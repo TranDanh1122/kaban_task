@@ -6,15 +6,23 @@ import { SidebarInset, SidebarProvider, SidebarTrigger, } from "@/components/ui/
 import { useDialog } from "@/hooks/use-dialog";
 import CreateBoardForm from "@/components/app/Board/create-form";
 import useFetchBoard from "@/hooks/use-fetch-board"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
+import ConfirmDialog from "./confirm-dialog"
+import { useQueryClient } from "@tanstack/react-query"
 interface Props {
     children: React.ReactNode
 }
 const Layout = ({ children }: Props): React.JSX.Element => {
     const { isOpen } = useDialog()
-    const { boards, isLoading } = useFetchBoard()
+    const { boards, isLoading } = useFetchBoard();
     const pathNames = usePathname().split("/")
     const page = pathNames[pathNames.length - 1]
+    const queryClient = useQueryClient()
+    const searchParams = useSearchParams();
+    const isArchive = searchParams.get("isArchive") !== "false";
+    React.useEffect(() => {
+        queryClient.invalidateQueries({ queryKey: ['boards'] })
+    }, [isArchive])
     return <>
         <SidebarProvider>
             <AppSidebar />
@@ -37,6 +45,8 @@ const Layout = ({ children }: Props): React.JSX.Element => {
             </SidebarInset>
         </SidebarProvider>
         {isOpen("BoardForm") && <CreateBoardForm />}
+        {isOpen("ConfirmDialog") && <ConfirmDialog />}
+
     </>
 }
 Layout.displayName = "Layout"

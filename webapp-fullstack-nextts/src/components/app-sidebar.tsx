@@ -1,6 +1,6 @@
 "use client"
 import * as React from "react"
-import { BookOpen, Settings2, PlusCircleIcon } from "lucide-react"
+import { BookOpen, PlusCircleIcon } from "lucide-react"
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
@@ -9,7 +9,8 @@ import { usePathname } from "next/navigation"
 import { useDialog } from "@/hooks/use-dialog"
 import { useSession } from "next-auth/react"
 import useFetchBoard from "@/hooks/use-fetch-board"
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
+import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
+import Link from "next/link"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathName = usePathname()
@@ -21,7 +22,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return {
       title: el.title,
       url: `/board/${el.slug}`,
+      slug: el.slug,
       icon: BookOpen,
+      isArchive: el.isArchive,
       isActive: pathName.split("/").some(item => item == el.slug),
 
     }
@@ -48,10 +51,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     }
   }, [boardItems, session])
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher />
+        <Link href="/">
+          <TeamSwitcher />
+        </Link>
       </SidebarHeader>
       <SidebarContent className="bg-white">
         <SidebarGroup className="pb-0">

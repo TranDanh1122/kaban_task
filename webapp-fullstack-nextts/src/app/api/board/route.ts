@@ -4,20 +4,25 @@ import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
     try {
-        const { columns, title } = await req.json()
+        const { columns, title, id } = await req.json()
         const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET, cookieName: "kanban-session-token" })
         if (!token) return NextResponse.json({ message: "Unauthorize" }, { status: 401 })
         if (!columns || columns.length <= 0 || !title) return NextResponse.json({ message: "Invalid Data" }, { status: 400 })
         const boards = await prisma.board.findMany({ where: { userId: token?.user?.id ?? "" } })
         const slug = createSlug(title, boards)
-        const board = await prisma.board.create({
-            data: { title: title, userId: token?.user?.id ?? "", slug: slug, Status: { create: columns } }
+        let queyParam: any = { slug_userId: { userId: token?.user?.id ?? "", slug: slug } }
+        if (id) {
+            queyParam = { userId: token?.user?.id ?? "", id: id }
+        }
+        const board = await prisma.board.upsert({
+            where: queyParam,
+            update: { title: title, slug: slug, Status: { deleteMany: {}, create: columns } },
+            create: { title: title, userId: token?.user?.id ?? "", slug: slug, Status: { create: columns } }
         })
         if (!board) return NextResponse.json({ message: "Error when create Board" }, { status: 400 })
-        return NextResponse.json({ message: "Create A Board Successfully" }, { status: 200 })
+        return NextResponse.json({ data: board, message: id ? "Update board Successfully" : "Create A Board Successfully" }, { status: 200 })
     } catch (error) {
         console.error(error);
-
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
     }
 }
@@ -25,31 +30,14 @@ export async function GET(req: NextRequest) {
     try {
         const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET, cookieName: "kanban-session-token" })
         if (!token) return NextResponse.json({ message: "Unauthorize" }, { status: 401 })
-        const boards = await prisma.board.findMany({ where: { userId: token.user?.id, isArchive: false } })
+        const { searchParams } = new URL(req.url)
+        const isArchive = searchParams.get("isArchive")
+        console.log(isArchive);
+
+        const boards = await prisma.board.findMany({ where: { userId: token.user?.id, isArchive: isArchive ? isArchive === "true" : false } })
         return NextResponse.json(boards, { status: 200 })
     } catch (error) {
-        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
-    }
-}
-export async function PUT(req: NextRequest) {
-    try {
-        const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET, cookieName: "kanban-session-token" })
-        if (!token) return NextResponse.json({ message: "Unauthorize" }, { status: 401 })
-        const updateData = await req.json()
-        const board = await prisma.board.update({ where: { userId: token.user?.id, id: updateData.id }, data: updateData })
-        return NextResponse.json(board, { status: 200 })
-    } catch (error) {
-        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
-    }
-}
-export async function DELETE(req: NextRequest) {
-    try {
-        const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET, cookieName: "kanban-session-token" })
-        if (!token) return NextResponse.json({ message: "Unauthorize" }, { status: 401 })
-        const updateData = await req.json()
-        const board = await prisma.board.delete({ where: { userId: token.user?.id, id: updateData.id } })
-        return NextResponse.json({ status: 200 })
-    } catch (error) {
+        console.error(error)
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
     }
 }

@@ -9,8 +9,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { useDialog } from "@/hooks/use-dialog"
 import { XIcon } from "lucide-react"
-import useFetchBoard, { useCreateBoard } from "@/hooks/use-fetch-board"
-import { createSlug } from "@/lib/createSlug"
+import { useCreateOrUpdateBoard } from "@/hooks/use-fetch-board"
+
 interface Props {
     board?: Board,
 }
@@ -22,23 +22,27 @@ const formSchema = z.object({
             color: z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/, "Invalid color code"),
         })
     ).min(1, "At least one column is required"),
-    icon: z.string({ message: "Please chose icon" }),
 })
 
 
-export default function CreateBoardForm({ board }: Props): React.JSX.Element {
+export default function CreateBoardForm(): React.JSX.Element {
+    const { state, isOpen, dispatch } = useDialog()
+    const board: Board | undefined = state.find(el => el.name == "BoardForm")?.data as Board
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            title: "",
-            icon: ""
-        },
+            title: board?.title ?? "",
+            columns: board?.Status ?? [{
+                name: "",
+                color: "",
+            }],
+        }
     })
-    const createNewBoard = useCreateBoard()
+    const createNewBoard = useCreateOrUpdateBoard()
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        createNewBoard.mutate(data)
+        createNewBoard.mutate({ ...data, id: board.id ?? "" })
     }
-    const { isOpen, dispatch } = useDialog()
+
     const { fields, append, remove } = useFieldArray({
         control: form.control,
         name: "columns",

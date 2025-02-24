@@ -30,6 +30,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { signOut } from "next-auth/react"
+import Link from "next/link"
 
 export function NavUser({
   user,
@@ -79,8 +80,10 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Archive />
-                Archived Plan
+                <Link href="/?isArchive=true" className="flex gap-2">
+                  <Archive />
+                  Archived Plan
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

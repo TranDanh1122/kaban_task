@@ -1,22 +1,29 @@
 'use client'
 import React from "react"
-export type action = { type: "TOOGLE", payload: { name: string, state: boolean } }
+export type action = { type: "TOOGLE", payload: { name: string, state: boolean } } | { type: "SETDATA", payload: { name: string, data: object } }
 
 interface Dialog {
     name: string,
-    status: boolean
+    status: boolean,
+    data?: object
 }
 const initData: Dialog[] = [
-    { name: "BoardForm", status: false },
+    { name: "BoardForm", status: false, data: {} },
     { name: "TaskForm", status: false },
     { name: "TaskView", status: false },
-    { name: "ConfirmDialog", status: false }
+    { name: "ConfirmDialog", status: false, data: {} }
 ]
 const reducer = (state: Dialog[], action: action) => {
     switch (action.type) {
         case "TOOGLE": {
             return state.map(el => {
                 if (el.name == action.payload.name) return { ...el, status: action.payload.state }
+                return el
+            })
+        }
+        case "SETDATA": {
+            return state.map(el => {
+                if (el.name == action.payload.name) return { ...el, data: { ...el.data, ...action.payload.data } }
                 return el
             })
         }

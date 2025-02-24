@@ -34,19 +34,23 @@ export default function BoardDetail({ params }: { params: { slug: string } }) {
 const Toolbox = React.memo(({ className, board }: { className: string, board: Board }) => {
     const pathname = usePathname();
     const slug = pathname.split("/").pop();
-    const {  dispatch } = useDialog()
+    const { dispatch } = useDialog()
 
     const handleEditBoard = React.useCallback(() => {
         dispatch({ type: "TOOGLE", payload: { name: "BoardForm", state: true } })
         dispatch({ type: "SETDATA", payload: { name: "BoardForm", data: board } })
 
     }, [slug])
+    const handleCreateTask = () => {
+        dispatch({ type: "TOOGLE", payload: { name: "TaskForm", state: true } })
+        dispatch({ type: "SETDATA", payload: { name: "TaskForm", data: { status: board.Status } } })
+    }
     return <>  <Popover>
         <PopoverTrigger asChild>
             <Sparkle className={` ${className}`} />
         </PopoverTrigger>
         <PopoverContent className="w-12 p-0">
-            <ActionButton action="Add Task"> <ListTodo className=" w-full h-full" /></ActionButton>
+            <ActionButton action="Add Task" > <ListTodo onClick={handleCreateTask} className=" w-full h-full" /></ActionButton>
             <Separator orientation="horizontal" className="h-px" />
             <ActionButton action="Edit Board"> <PencilRuler onClick={handleEditBoard} className="w-full h-full" /></ActionButton>
             <Separator orientation="horizontal" className="h-px" />

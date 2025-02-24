@@ -1,7 +1,7 @@
 "use client"
 import * as React from "react"
 import { BookOpen, PlusCircleIcon } from "lucide-react"
-import { NavMain } from "@/components/nav-main"
+import NavMain from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar"

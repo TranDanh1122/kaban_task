@@ -11,9 +11,6 @@ import { useDialog } from "@/hooks/use-dialog"
 import { XIcon } from "lucide-react"
 import { useCreateOrUpdateBoard } from "@/hooks/use-fetch-board"
 
-interface Props {
-    board?: Board,
-}
 const formSchema = z.object({
     title: z.string().min(2, { message: "Title atleast 2 character" }).max(50),
     columns: z.array(

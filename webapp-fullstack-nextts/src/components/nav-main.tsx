@@ -3,7 +3,7 @@
 import { Archive, ArchiveRestore, BadgeX, Ellipsis, type LucideIcon } from "lucide-react"
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
 import Link from "next/link"
-import useFetchBoard, { useUpdateBoard } from "@/hooks/use-fetch-board"
+import useFetchBoard, { useDeleteBoard, useUpdateBoard } from "@/hooks/use-fetch-board"
 import {
   Popover,
   PopoverContent,
@@ -13,7 +13,7 @@ import { Button } from "./ui/button"
 import { useDialog } from "@/hooks/use-dialog"
 import React from "react"
 import { useSearchParams } from "next/navigation"
-export function NavMain({ items }: {
+function NavMain({ items }: {
   items: {
     id: string,
     title: string
@@ -33,7 +33,7 @@ export function NavMain({ items }: {
   const { boards } = useFetchBoard()
   const { dispatch } = useDialog()
   const updater = useUpdateBoard()
-
+  const deleter = useDeleteBoard()
   React.useEffect(() => {
     dispatch({
       type: "SETDATA", payload: {
@@ -43,6 +43,15 @@ export function NavMain({ items }: {
       }
     })
   }, [updater.isPending])
+  React.useEffect(() => {
+    dispatch({
+      type: "SETDATA", payload: {
+        name: "ConfirmDialog", data: {
+          isLoading: deleter.isPending
+        }
+      }
+    })
+  }, [deleter.isPending])
   const handleArchive = (title: string, slug: string) => {
     dispatch({
       type: "SETDATA", payload: {
@@ -71,6 +80,21 @@ export function NavMain({ items }: {
     })
     dispatch({ type: "TOOGLE", payload: { name: "ConfirmDialog", state: true } })
   }
+  const handleDelete = (title: string, slug: string) => {
+    dispatch({
+      type: "SETDATA", payload: {
+        name: "ConfirmDialog", data: {
+          title: "Delete this plan?",
+          desc: `Are you sure you want to delete the ‘${title} plan? 
+          This action will remove this plan forever!`,
+          action: () => deleter.mutate({ slug: slug }),
+          actionTitle: 'Delete',
+          primaryColor: "#EA5555"
+        }
+      }
+    })
+    dispatch({ type: "TOOGLE", payload: { name: "ConfirmDialog", state: true } })
+  }
   const searchParams = useSearchParams();
   const isArchive = searchParams.get("isArchive") === "true";
   return (
@@ -90,14 +114,14 @@ export function NavMain({ items }: {
                 <PopoverContent className="w-fit px-2 flex flex-col font-semibold">
                   {item.isArchive && <Button onClick={() => handleRestore(item.title, item.slug)} className="bg-white hover:bg-slate-100 text-black"><ArchiveRestore /> Restore Plan</Button>}
                   {!item.isArchive && <Button onClick={() => handleArchive(item.title, item.slug)} className="bg-white hover:bg-slate-100 text-black"><Archive /> Archive Plan</Button>}
-                  <Button onClick={() => dispatch({ type: "TOOGLE", payload: { name: "ConfirmDialog", state: true } })} className="text-accent-200 bg-white hover:bg-slate-100"><BadgeX /> Delete Plan</Button>
+                  <Button onClick={() => handleDelete(item.title, item.slug)} className="text-accent-200 bg-white hover:bg-slate-100"><BadgeX /> Delete Plan</Button>
                 </PopoverContent>
               </Popover>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}
       </SidebarMenu>
-    </SidebarGroup>
+    </SidebarGroup >
   )
 }
-
+export default React.memo(NavMain)

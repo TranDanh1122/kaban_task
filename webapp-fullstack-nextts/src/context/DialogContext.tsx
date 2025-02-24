@@ -9,7 +9,7 @@ interface Dialog {
 }
 const initData: Dialog[] = [
     { name: "BoardForm", status: false, data: {} },
-    { name: "TaskForm", status: false },
+    { name: "TaskForm", status: false, data: {} },
     { name: "TaskView", status: false },
     { name: "ConfirmDialog", status: false, data: {} }
 ]

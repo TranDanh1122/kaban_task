@@ -1,11 +1,15 @@
 declare global {
+    interface Subtask {
+        id: string
+        name: string
+        status: boolean
+    }
     interface Task {
         id: string,
         title: string,
         content: string,
-        author: User,
-        status: Status,
-        board: Board,
+        statusId: string,
+        subtasks: Subtask[]
     }
 
     interface Status {

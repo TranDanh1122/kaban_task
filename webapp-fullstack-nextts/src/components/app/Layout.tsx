@@ -9,6 +9,7 @@ import useFetchBoard from "@/hooks/use-fetch-board"
 import { usePathname, useSearchParams } from "next/navigation"
 import ConfirmDialog from "./confirm-dialog"
 import { useQueryClient } from "@tanstack/react-query"
+import CreateTaskForm from "./Task/create-task-form"
 interface Props {
     children: React.ReactNode
 }
@@ -46,6 +47,7 @@ const Layout = ({ children }: Props): React.JSX.Element => {
         </SidebarProvider>
         {isOpen("BoardForm") && <CreateBoardForm />}
         {isOpen("ConfirmDialog") && <ConfirmDialog />}
+        {isOpen("TaskForm") && <CreateTaskForm />}
 
     </>
 }

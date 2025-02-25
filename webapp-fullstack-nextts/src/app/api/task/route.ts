@@ -22,6 +22,8 @@ export async function POST(req: NextRequest) {
         if (!task) return NextResponse.json({ message: "Invalid Data" }, { status: 400 })
         return NextResponse.json({task: task , message : id ? "Update Task Success":"Create Task Success"}, { status: 200 })
     } catch (error) {
+        console.error(error);
+        
         return NextResponse.json({ message: "Internal server error" }, { status: 500 })
     }
 }

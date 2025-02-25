@@ -17,7 +17,6 @@ export default function useFetchBoard() {
         },
         staleTime: 10 * 60 * 1000,
         refetchOnWindowFocus: false
-
     })
     React.useEffect(() => {
         if (!isError) return

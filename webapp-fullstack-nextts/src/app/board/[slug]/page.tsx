@@ -10,11 +10,19 @@ import Status, { StatusSkeleton } from "@/components/app/Status/status"
 import { useGetBoardBySlug } from "@/hooks/use-fetch-board"
 import { notFound, usePathname } from "next/navigation"
 import { useDialog } from "@/hooks/use-dialog"
+import { SidebarTrigger } from "@/components/ui/sidebar"
 
 export default function BoardDetail({ params }: { params: { slug: string } }) {
     const { board, isLoading, isError } = useGetBoardBySlug(params.slug)
     if (!isLoading && !board) return notFound()
     return <Layout>
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+            <div className="flex items-center gap-2 px-4  w-full">
+                <SidebarTrigger className="-ml-1" />
+                <Separator orientation="vertical" className="mr-2 h-4" />
+                {!isLoading && board && <span className="heading-xl">{board.title}</span>}
+            </div>
+        </header>
         <ScrollArea className="w-full h-screen max-h-[calc(100vh-64px)] bg-primary-100/20 p-6">
             <div className="flex items-start gap-4">
                 {isError && <div className="w-full h-full flex items-center justify-center font-semibold mt-20">Error when loading, please try again later</div>}
@@ -50,17 +58,17 @@ const Toolbox = React.memo(({ className, board }: { className: string, board: Bo
             <Sparkle className={` ${className}`} />
         </PopoverTrigger>
         <PopoverContent className="w-12 p-0">
-            <ActionButton action="Add Task" > <ListTodo onClick={handleCreateTask} className=" w-full h-full" /></ActionButton>
+            <ActionButton action="Add Task" onClick={handleCreateTask}  > <ListTodo className=" w-full h-full" /></ActionButton>
             <Separator orientation="horizontal" className="h-px" />
-            <ActionButton action="Edit Board"> <PencilRuler onClick={handleEditBoard} className="w-full h-full" /></ActionButton>
+            <ActionButton action="Edit Board" onClick={handleEditBoard}> <PencilRuler className="w-full h-full" /></ActionButton>
             <Separator orientation="horizontal" className="h-px" />
         </PopoverContent>
     </Popover></>
 })
-const ActionButton = ({ children, action }: { children: React.ReactNode, action: string }): React.JSX.Element => {
+const ActionButton = ({ children, action, onClick }: { children: React.ReactNode, action: string, onClick: () => void }): React.JSX.Element => {
     return <><TooltipProvider>
         <Tooltip defaultOpen={false}>
-            <TooltipTrigger className="w-full p-3 border-2 border-transparent hover:border-border">{children}</TooltipTrigger>
+            <TooltipTrigger onClick={onClick} className="w-full p-3 border-2 border-transparent hover:border-border">{children}</TooltipTrigger>
             <TooltipContent>
                 <p>{action}</p>
             </TooltipContent>

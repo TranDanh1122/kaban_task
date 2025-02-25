@@ -4,25 +4,27 @@ import { AxiosClient } from "@/lib/axios-client"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { useDialog } from "./use-dialog"
+import { usePathname } from "next/navigation"
 
 
 export const useCreateOrUpdateTask = () => {
     const queryClient = useQueryClient()
     const { dispatch } = useDialog();
-
+    const pathNames = usePathname()
+    const slug = pathNames.split('/').pop()
     return useMutation({
         mutationFn: async (data: any) => {
-            const res = await AxiosClient.post(`${process.env.NEXT_PUBLIC_API_URL}`, data)
+            const res = await AxiosClient.post(`${process.env.NEXT_PUBLIC_API_URL}/task`, data)
             if (res.status != 200) throw new Error(res.data.message || "Create Or Update Task Error")
             return res.data
         },
         onError: (error: any) => {
-            toast.error(error.response.data.message || "Error creating board", {
+            toast.error(error.response.data.message || error.response.statusText || "Error creating task", {
                 style: { color: "red" }
             });
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ['boards'] })
+            queryClient.invalidateQueries({ queryKey: ['board', slug] })
             toast.success(data.message || "Task create success", {
                 style: { color: "green" }
             })

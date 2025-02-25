@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { FieldArrayWithId, useFieldArray, useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { useCreateOrUpdateTask } from "@/hooks/use-fetch-task";
+import { useCreateOrUpdateTask, useDeleteTask } from "@/hooks/use-fetch-task";
 import { BadgeX, Edit, Ellipsis } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox";
@@ -37,7 +37,7 @@ export default function ViewTaskForm(): React.JSX.Element {
         },
     })
     const createNewTask = useCreateOrUpdateTask()
-
+    const deleter = useDeleteTask()
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         createNewTask.mutate({ ...task, ...data, id: task?.id ?? "" })
     }
@@ -55,8 +55,29 @@ export default function ViewTaskForm(): React.JSX.Element {
     }
 
     const handleDelete = () => {
-
+        dispatch({
+            type: "SETDATA", payload: {
+                name: "ConfirmDialog", data: {
+                    title: "Delete this task?",
+                    desc: `Are you sure you want to delete the ‘${task?.title} task? This action will remove this task forever!`,
+                    action: () => deleter.mutate(task?.id || ""),
+                    actionTitle: 'Delete',
+                    primaryColor: "#EA5555"
+                }
+            }
+        })
+        dispatch({ type: "TOOGLE", payload: { name: "ConfirmDialog", state: true } })
     }
+      React.useEffect(() => {
+        dispatch({
+          type: "SETDATA", payload: {
+            name: "ConfirmDialog", data: {
+              isLoading: deleter.isPending
+            }
+          }
+        })
+      }, [deleter.isPending])
+
     return <Dialog onOpenChange={(open) => dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: open } })} open={isOpen("TaskView")}>
         <DialogTrigger asChild></DialogTrigger>
         <DialogContent>

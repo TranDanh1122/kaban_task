@@ -12,10 +12,12 @@ import { BadgeX, Edit, Ellipsis } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
     subtasks: z.array(
         z.object({
+            name: z.string(),
             status: z.boolean()
         })
     ).optional(),
@@ -37,9 +39,7 @@ export default function ViewTaskForm(): React.JSX.Element {
     const createNewTask = useCreateOrUpdateTask()
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        console.log(1);
-
-        createNewTask.mutate({ ...data, id: task?.id ?? "" })
+        createNewTask.mutate({ ...task, ...data, id: task?.id ?? "" })
     }
     const { fields } = useFieldArray({
         control: form.control,
@@ -47,26 +47,31 @@ export default function ViewTaskForm(): React.JSX.Element {
         shouldUnregister: false,
     });
     const handleEdit = () => {
-
+        dispatch({ type: "TOOGLE", payload: { name: "TaskForm", state: true } })
+        dispatch({ type: "SETDATA", payload: { name: "TaskForm", data: { task: task, status: status } } })
+        setTimeout(() => {
+            dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: false } })
+        }, 300)
     }
+
     const handleDelete = () => {
 
     }
     return <Dialog onOpenChange={(open) => dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: open } })} open={isOpen("TaskView")}>
         <DialogTrigger asChild></DialogTrigger>
         <DialogContent>
-            <DialogHeader>
-                <DialogTitle className="heading-l font-bold ">{task?.title}</DialogTitle>
+            <div className="flex items-center justify-between flex-row mt-3">
+                <p className="heading-l font-bold w-full text-ellipsis line-clamp-3">{task?.title}</p>
                 <Popover>
-                    <PopoverTrigger><Ellipsis /></PopoverTrigger>
-                    <PopoverContent className="w-fit px-2 flex flex-col font-semibold">
-                        <Button onClick={() => handleEdit()} className="bg-white hover:bg-slate-100 text-black"><Edit /> Edit Task</Button>
-                        <Button onClick={() => handleDelete()} className="text-accent-200 bg-white hover:bg-slate-100"><BadgeX /> Delete Task</Button>
+                    <PopoverTrigger className=""><Ellipsis /></PopoverTrigger>
+                    <PopoverContent className="w-fit px-2 flex flex-col items-start font-semibold">
+                        <Button onClick={() => handleEdit()} className="bg-white w-full hover:bg-slate-100 justify-start text-black"><Edit className="block" /> Edit Task</Button>
+                        <Button onClick={() => handleDelete()} className="text-accent-200 w-full bg-white justify-start hover:bg-slate-100"><BadgeX /> Delete Task</Button>
                     </PopoverContent>
                 </Popover>
-            </DialogHeader>
+            </div>
 
-            <p className="font-semibold text-secondary-100 text-base">{task?.content}</p>
+            <p className="font-semibold text-secondary-100 text-base line-clamp-3 text-ellipsis">{task?.content}</p>
             {
                 task?.subtasks &&
                 <Form {...form}>
@@ -76,22 +81,37 @@ export default function ViewTaskForm(): React.JSX.Element {
                             <legend className="font-semibold text-secondary-100 text-sm">Subtask</legend>
 
                             {fields.map((field: FieldArrayWithId, index: number) => (
+
                                 <div key={field.id} className="flex gap-2 items-start w-full">
-                                    <FormLabel>
-                                        <FormField
-                                            control={form.control}
-                                            name={`subtasks.${index}.status`}
-                                            render={({ field }) => (
-                                                <FormItem className="w-full">
+                                    <FormField
+                                        control={form.control}
+                                        name={`subtasks.${index}.status`}
+                                        render={({ field }) => (
+                                            <FormItem className="w-full">
+                                                <FormLabel style={{ color: `${field.value ? "#828FA3" : "black"}` }} htmlFor={`subtasks.${index}.status`} className="text-ellipsis w-full p-4 bg-primary-100 rounded-md font-semibold flex items-center gap-3 justify-start">
                                                     <FormControl>
-                                                        <Checkbox checked={field.value} onCheckedChange={(value => field.onChange(value))} />
+                                                        <Checkbox id={`subtasks.${index}.status`}
+                                                            checked={field.value} className="data-[state=checked]:bg-primary-300 data-[state=checked]:border-transparent"
+                                                            onCheckedChange={(value => field.onChange(value))} />
                                                     </FormControl>
-                                                    <FormMessage className="text-accent-200 font-semibold" />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        111
-                                    </FormLabel>
+                                                    {task.subtasks[index].name}
+                                                </FormLabel>
+                                                <FormMessage className="text-accent-200 font-semibold" />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name={`subtasks.${index}.name`}
+                                        render={({ field }) => (
+                                            <FormItem className="hidden">
+                                                <FormControl>
+                                                    <Input {...field} />
+                                                </FormControl>
+                                                <FormMessage className="text-accent-200 font-semibold" />
+                                            </FormItem>
+                                        )}
+                                    />
                                 </div>
                             ))}
                             {form.formState.errors.subtasks && <FormMessage>{form.formState.errors.subtasks.message}</FormMessage>}
@@ -101,7 +121,7 @@ export default function ViewTaskForm(): React.JSX.Element {
                             name="status"
                             render={({ field }) => (
                                 <FormItem>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select onValueChange={(value) => { field.onChange(value) }} defaultValue={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="How this task going on?" />
@@ -120,6 +140,10 @@ export default function ViewTaskForm(): React.JSX.Element {
                                 </FormItem>
                             )}
                         />
+                        <Button disabled={createNewTask.isPending} className="text-primary-100 bg-primary-300 font-semibold hover:bg-primary-300 w-full rounded-3xl" type="submit">
+                            {!createNewTask.isPending && "Save change"}
+                            {createNewTask.isPending && <div className="border-white border-t-2 border-r-2 animate-spin rounded-full w-5 h-5"></div>}
+                        </Button>
                     </form>
                 </Form>
             }

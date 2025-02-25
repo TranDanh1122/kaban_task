@@ -34,7 +34,8 @@ export default function CreateTaskForm(): React.JSX.Element {
         defaultValues: {
             title: task?.title ?? "",
             content: task?.content ?? "",
-            subtasks: task?.subtasks ?? []
+            subtasks: task?.subtasks ?? [],
+            status : task?.statusId ?? ''
         },
     })
     const createNewTask = useCreateOrUpdateTask()
@@ -122,7 +123,7 @@ export default function CreateTaskForm(): React.JSX.Element {
                         name="status"
                         render={({ field }) => (
                             <FormItem>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select onValueChange={field.onChange} defaultValue={task?.statusId}>
                                     <FormControl>
                                         <SelectTrigger>
                                             <SelectValue placeholder="How this task going on?" />

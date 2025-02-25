@@ -29,6 +29,7 @@ export const useCreateOrUpdateTask = () => {
                 style: { color: "green" }
             })
             dispatch({ type: "TOOGLE", payload: { name: "TaskForm", state: false } });
+            dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: false } })
         }
     })
 }

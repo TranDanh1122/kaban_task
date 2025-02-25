@@ -11,19 +11,24 @@ export async function POST(req: NextRequest) {
         const query = { id: id, statusId: status }
         const task = await prisma.task.upsert({
             where: query,
-            update: { title: title, content: content, subtasks: { deleteMany: {}, create: subtasks } },
+            update: {
+                title: title,
+                content: content,
+                status: { connect: { id: status } },
+                subtasks: { deleteMany: {}, create: subtasks }
+            },
             create: {
                 title: title,
                 content: content,
-                statusId: status,
                 subtasks: { create: subtasks },
+                status: { connect: { id: status } }
             }
         })
         if (!task) return NextResponse.json({ message: "Invalid Data" }, { status: 400 })
-        return NextResponse.json({task: task , message : id ? "Update Task Success":"Create Task Success"}, { status: 200 })
+        return NextResponse.json({ task: task, message: id ? "Update Task Success" : "Create Task Success" }, { status: 200 })
     } catch (error) {
         console.error(error);
-        
+
         return NextResponse.json({ message: "Internal server error" }, { status: 500 })
     }
 }

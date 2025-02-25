@@ -12,7 +12,7 @@ datasource db {
 model Subtask {
     id     String  @id @default(cuid())
     name   String
-    status Boolean
+    status Boolean @default(false)
     task   Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
     taskId String
 }

@@ -111,10 +111,10 @@ function NavMain({ items }: {
               </Link>
               <Popover>
                 <PopoverTrigger><Ellipsis /></PopoverTrigger>
-                <PopoverContent className="w-fit px-2 flex flex-col font-semibold">
-                  {item.isArchive && <Button onClick={() => handleRestore(item.title, item.slug)} className="bg-white hover:bg-slate-100 text-black"><ArchiveRestore /> Restore Plan</Button>}
-                  {!item.isArchive && <Button onClick={() => handleArchive(item.title, item.slug)} className="bg-white hover:bg-slate-100 text-black"><Archive /> Archive Plan</Button>}
-                  <Button onClick={() => handleDelete(item.title, item.slug)} className="text-accent-200 bg-white hover:bg-slate-100"><BadgeX /> Delete Plan</Button>
+                <PopoverContent className="w-fit px-2 flex flex-col items-start font-semibold">
+                  {item.isArchive && <Button onClick={() => handleRestore(item.title, item.slug)} className="bg-white w-full justify-start hover:bg-slate-100 text-black"><ArchiveRestore /> Restore Plan</Button>}
+                  {!item.isArchive && <Button onClick={() => handleArchive(item.title, item.slug)} className="bg-white w-full justify-start hover:bg-slate-100 text-black"><Archive /> Archive Plan</Button>}
+                  <Button onClick={() => handleDelete(item.title, item.slug)} className="text-accent-200 bg-white w-full justify-start hover:bg-slate-100"><BadgeX /> Delete Plan</Button>
                 </PopoverContent>
               </Popover>
             </SidebarMenuButton>

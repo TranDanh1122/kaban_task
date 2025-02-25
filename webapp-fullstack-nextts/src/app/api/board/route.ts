@@ -8,13 +8,21 @@ export async function POST(req: NextRequest) {
         const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET, cookieName: "kanban-session-token" })
         if (!token) return NextResponse.json({ message: "Unauthorize" }, { status: 401 })
         if (!columns || columns.length <= 0 || !title) return NextResponse.json({ message: "Invalid Data" }, { status: 400 })
+
         const boards = await prisma.board.findMany({ where: { userId: token?.user?.id ?? "" } })
-        const oldSlug = slug  ?? ""     
-        const newSlug =  createSlug(title, boards) 
+        const oldSlug = slug ?? ""
+        const newSlug = createSlug(title, boards)
         const queyParam = { slug_userId: { userId: token?.user?.id ?? "", slug: oldSlug } }
         const board = await prisma.board.upsert({
             where: queyParam,
-            update: { title: title, slug: newSlug, Status: { deleteMany: {}, create: columns } },
+            update: {
+                title: title, slug: newSlug, Status: {
+                    updateMany: columns.map((status: Status) => ({
+                        where: { id: status.id }, // Cập nhật đúng Status theo ID
+                        data: { name: status.name, color: status.color },
+                    }))
+                }
+            },
             create: { title: title, userId: token?.user?.id ?? "", slug: newSlug, Status: { create: columns } }
         })
         if (!board) return NextResponse.json({ message: "Error when create Board" }, { status: 400 })

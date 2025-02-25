@@ -55,7 +55,7 @@ export const useCreateOrUpdateBoard = () => {
             return res.data
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ['boards'] })
+            queryClient.invalidateQueries({ queryKey: ['board', data.data.slug] })
             toast.success(data.message || "Board create success", {
                 style: { color: "green" }
             })

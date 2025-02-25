@@ -92,10 +92,10 @@ export function NavUser({
                 <BadgeCheck />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              {/* <DropdownMenuItem>
                 <Bell />
                 Notifications
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuItem>
                 <Settings />
                 Setting

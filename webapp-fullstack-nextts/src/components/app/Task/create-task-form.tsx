@@ -41,9 +41,8 @@ export default function CreateTaskForm(): React.JSX.Element {
     const [createOrUpdateMutate, { isLoading }] = useCreateOrUpdateMutation()
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         createOrUpdateMutate({ ...data, id: task?.id ?? "" })
-        setTimeout(() => {
-            dispatch({ type: "TOOGLE", payload: { name: "TaskForm", state: false } })
-        }, 300)
+        dispatch({ type: "TOOGLE", payload: { name: "TaskForm", state: false } })
+
     }
     const { fields, append, remove } = useFieldArray({
         control: form.control,

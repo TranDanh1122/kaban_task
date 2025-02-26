@@ -41,10 +41,8 @@ export default function CreateBoardForm({ isCreate }: { isCreate: boolean }): Re
     const updateBoardMutation = useUpdateBoardMutation();
     const [mutation, { isLoading }] = isCreate ? createBoardMutation : updateBoardMutation;
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-       await mutation({ ...data, id: board?.id ?? "", slug: board?.slug ?? "" })
-       setTimeout(() => {
+        mutation({ ...data, id: board?.id ?? "", slug: board?.slug ?? "" })
         dispatch({ type: "TOOGLE", payload: { name: isCreate ? "BoardForm" : 'BoardFormEdit', state: false } })
-       }, 100)
     }
 
 

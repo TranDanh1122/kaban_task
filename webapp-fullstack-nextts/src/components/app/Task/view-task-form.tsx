@@ -40,9 +40,7 @@ export default function ViewTaskForm(): React.JSX.Element {
     const [deleter, { isLoading: deleterLoading }] = useDeleteTaskMutation()
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         updateTask({ ...task, ...data, id: task?.id ?? "" })
-        setTimeout(() => {
-            dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: false } })
-        }, 300)
+        dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: false } })
     }
     const { fields } = useFieldArray({
         control: form.control,
@@ -51,9 +49,7 @@ export default function ViewTaskForm(): React.JSX.Element {
     });
     const handleEdit = () => {
         dispatch({ type: "TOOGLE", payload: { name: "TaskForm", state: true } })
-        setTimeout(() => {
-            dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: false } })
-        }, 300)
+        dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: false } })
     }
 
     const handleDelete = () => {

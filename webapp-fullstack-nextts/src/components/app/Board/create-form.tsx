@@ -9,9 +9,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { useDialog } from "@/hooks/use-dialog"
 import { XIcon } from "lucide-react"
-import { useCreateOrUpdateBoard } from "@/hooks/use-fetch-board"
 import { useAppCoordinator } from "@/hooks/useCoordinator"
-import { useCreateBoardMutation } from "@/redux/actions/boardAPI"
+import { useCreateBoardMutation, useUpdateBoardMutation } from "@/redux/actions/boardAPI"
 
 const formSchema = z.object({
     title: z.string().min(2, { message: "Title atleast 2 character" }).max(50),
@@ -24,9 +23,10 @@ const formSchema = z.object({
 })
 
 
-export default function CreateBoardForm(): React.JSX.Element {
-    const { state, isOpen, dispatch } = useDialog()
-    const { viewingBoard: board } = useAppCoordinator()
+export default function CreateBoardForm({ isCreate }: { isCreate: boolean }): React.JSX.Element {
+    const { isOpen, dispatch } = useDialog()
+    const { viewingBoard } = useAppCoordinator()
+    const board = isCreate ? undefined : viewingBoard
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -37,10 +37,16 @@ export default function CreateBoardForm(): React.JSX.Element {
             }],
         }
     })
-    const [createBoardMutation, { isLoading }] = useCreateBoardMutation()
+    const createBoardMutation = useCreateBoardMutation();
+    const updateBoardMutation = useUpdateBoardMutation();
+    const [mutation, { isLoading }] = isCreate ? createBoardMutation : updateBoardMutation;
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        createBoardMutation({ ...data, id: board?.id ?? "", slug: board?.slug ?? "" })
+       await mutation({ ...data, id: board?.id ?? "", slug: board?.slug ?? "" })
+       setTimeout(() => {
+        dispatch({ type: "TOOGLE", payload: { name: isCreate ? "BoardForm" : 'BoardFormEdit', state: false } })
+       }, 100)
     }
+
 
     const { fields, append, remove } = useFieldArray({
         control: form.control,
@@ -49,7 +55,7 @@ export default function CreateBoardForm(): React.JSX.Element {
     });
 
     return <>
-        <Dialog onOpenChange={(open) => dispatch({ type: "TOOGLE", payload: { name: "BoardForm", state: open } })} open={isOpen("BoardForm")}>
+        <Dialog onOpenChange={(open) => dispatch({ type: "TOOGLE", payload: { name: isCreate ? "BoardForm" : 'BoardFormEdit', state: open } })} open={isOpen(isCreate ? "BoardForm" : 'BoardFormEdit')}>
             <DialogTrigger asChild></DialogTrigger>
             <DialogContent>
                 <DialogHeader>

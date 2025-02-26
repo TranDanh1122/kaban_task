@@ -22,6 +22,9 @@ export async function POST(req: NextRequest) {
                 content: content,
                 subtasks: { create: subtasks },
                 status: { connect: { id: status } }
+            },
+            include: {
+                subtasks: true
             }
         })
         if (!task) return NextResponse.json({ message: "Invalid Data" }, { status: 400 })

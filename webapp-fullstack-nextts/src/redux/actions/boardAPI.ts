@@ -6,6 +6,7 @@ export const boardAPISlice = createApi({
 	tagTypes: ['Boards', 'Board'],
 	refetchOnFocus: false,
 	refetchOnReconnect: true,
+	refetchOnMountOrArgChange: false,
 	endpoints: (builder) => ({
 		getBoards: builder.query({
 			query: (isArchive: boolean) => ({
@@ -29,7 +30,7 @@ export const boardAPISlice = createApi({
 				method: "POST",
 				data: data
 			}),
-			invalidatesTags: [{ type: 'Boards' }]
+			invalidatesTags: (result) => result ? [{ type: 'Boards' }] : []
 		}),
 		updateBoard: builder.mutation({
 			query: (data) => ({
@@ -37,14 +38,14 @@ export const boardAPISlice = createApi({
 				method: "PUT",
 				data: data
 			}),
-			invalidatesTags: [{ type: 'Boards' }]
+			invalidatesTags: (result) => result ? [{ type: 'Boards' }] : []
 		}),
 		deleteBoard: builder.mutation({
 			query: (data) => ({
 				url: `board/${data.id}`,
 				method: 'DELETE',
 			}),
-			invalidatesTags: [{ type: 'Boards' }]
+			invalidatesTags: (result) => result ? [{ type: 'Boards' }] : []
 		})
 	})
 })

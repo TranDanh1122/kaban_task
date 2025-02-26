@@ -1,18 +1,19 @@
 'use client'
 import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { useDialog } from "@/hooks/use-dialog";
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FieldArrayWithId, useFieldArray, useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { useCreateOrUpdateTask, useDeleteTask } from "@/hooks/use-fetch-task";
 import { BadgeX, Edit, Ellipsis } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
+import { useCreateOrUpdateMutation, useDeleteTaskMutation } from "@/redux/actions/taskAPI";
+import { useAppCoordinator } from "@/hooks/useCoordinator";
 
 const formSchema = z.object({
     subtasks: z.array(
@@ -24,10 +25,9 @@ const formSchema = z.object({
     status: z.string({ message: "You need to set a status of this task " })
 })
 export default function ViewTaskForm(): React.JSX.Element {
-    const { state, isOpen, dispatch } = useDialog()
-    const taskData = state.find(el => el.name == "TaskView")?.data;
-    const task: Task | undefined = taskData ? (taskData.task as Task) : undefined;
-    const status: Status[] | undefined = taskData ? (taskData.status as Status[]) : undefined;
+    const { isOpen, dispatch } = useDialog()
+    const { viewingBoard, viewingTask: task } = useAppCoordinator()
+    const status = viewingBoard?.Status
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -36,10 +36,13 @@ export default function ViewTaskForm(): React.JSX.Element {
             status: task?.statusId ?? ''
         },
     })
-    const createNewTask = useCreateOrUpdateTask()
-    const deleter = useDeleteTask()
+    const [updateTask, { isLoading }] = useCreateOrUpdateMutation()
+    const [deleter, { isLoading: deleterLoading }] = useDeleteTaskMutation()
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        createNewTask.mutate({ ...task, ...data, id: task?.id ?? "" })
+        updateTask({ ...task, ...data, id: task?.id ?? "" })
+        setTimeout(() => {
+            dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: false } })
+        }, 300)
     }
     const { fields } = useFieldArray({
         control: form.control,
@@ -59,7 +62,7 @@ export default function ViewTaskForm(): React.JSX.Element {
                 name: "ConfirmDialog", data: {
                     title: "Delete this task?",
                     desc: `Are you sure you want to delete the ‘${task?.title} task? This action will remove this task forever!`,
-                    action: () => deleter.mutate(task?.id || ""),
+                    action: () => deleter(task?.id || ""),
                     actionTitle: 'Delete',
                     primaryColor: "#EA5555"
                 }
@@ -67,19 +70,20 @@ export default function ViewTaskForm(): React.JSX.Element {
         })
         dispatch({ type: "TOOGLE", payload: { name: "ConfirmDialog", state: true } })
     }
-      React.useEffect(() => {
+    React.useEffect(() => {
         dispatch({
-          type: "SETDATA", payload: {
-            name: "ConfirmDialog", data: {
-              isLoading: deleter.isPending
+            type: "SETDATA", payload: {
+                name: "ConfirmDialog", data: {
+                    isLoading: deleterLoading
+                }
             }
-          }
         })
-      }, [deleter.isPending])
+    }, [deleterLoading])
 
     return <Dialog onOpenChange={(open) => dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: open } })} open={isOpen("TaskView")}>
         <DialogTrigger asChild></DialogTrigger>
-        <DialogContent>
+        <DialogContent aria-describedby={task?.title}>
+            <DialogTitle></DialogTitle>
             <div className="flex items-center justify-between flex-row mt-3">
                 <p className="heading-l font-bold w-full text-ellipsis line-clamp-3">{task?.title}</p>
                 <Popover>
@@ -160,9 +164,9 @@ export default function ViewTaskForm(): React.JSX.Element {
                                 </FormItem>
                             )}
                         />
-                        <Button disabled={createNewTask.isPending} className="text-primary-100 bg-primary-300 font-semibold hover:bg-primary-300 w-full rounded-3xl" type="submit">
-                            {!createNewTask.isPending && "Save change"}
-                            {createNewTask.isPending && <div className="border-white border-t-2 border-r-2 animate-spin rounded-full w-5 h-5"></div>}
+                        <Button disabled={isLoading} className="text-primary-100 bg-primary-300 font-semibold hover:bg-primary-300 w-full rounded-3xl" type="submit">
+                            {!isLoading && "Save change"}
+                            {isLoading && <div className="border-white border-t-2 border-r-2 animate-spin rounded-full w-5 h-5"></div>}
                         </Button>
                     </form>
                 </Form>

@@ -1,5 +1,6 @@
 import { ActionReducerMapBuilder, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { boardAPISlice } from "../actions/boardAPI";
+import { taskApiSlicer } from "../actions/taskAPI";
 
 interface CoordinatorState {
     viewingBoardId?: string
@@ -38,7 +39,7 @@ const appCordinatorSlicer = createSlice({
         setViewingBoard: (state: CoordinatorState, action: PayloadAction<string | undefined>) => {
             state.viewingBoardId = action.payload
         },
-        setViewingTask: (state: CoordinatorState, action: PayloadAction<Task>) => {
+        setViewingTask: (state: CoordinatorState, action: PayloadAction<Task | undefined>) => {
             state.viewingTask = action.payload
         },
         setBoards: (state: CoordinatorState, action: PayloadAction<Board[]>) => {
@@ -59,11 +60,19 @@ const appCordinatorSlicer = createSlice({
         })
         handleExtraReducer<Board>(builder, boardAPISlice.endpoints.createBoard, (state: CoordinatorState, action: PayloadAction<Board>) => {
             state.boards.push(action.payload)
+            state.viewingBoardId = action.payload.id
+            state.viewingBoard = action.payload
             state.successMessage = "Create Plan Successfully"
         })
         handleExtraReducer<Board>(builder, boardAPISlice.endpoints.updateBoard, (state: CoordinatorState, action: PayloadAction<Board>) => {
+            console.log(action.payload);
+
             state.boards = state.boards.map(el => {
-                if (el.id == action.payload.id) return action.payload
+                if (el.id == action.payload.id) {
+                    state.viewingBoardId = action.payload.id
+                    state.viewingBoard = action.payload
+                    return action.payload
+                }
                 return el
             })
             state.successMessage = "Update Plan Successfully"
@@ -78,6 +87,29 @@ const appCordinatorSlicer = createSlice({
         })
         builder.addMatcher((action) => action.type === "coordinator/setViewingBoard", (state: CoordinatorState) => {
             state.viewingBoard = state.boards.find(el => el.id === state.viewingBoardId)
+        })
+        handleExtraReducer<{ task: Task, message: string }>(builder, taskApiSlicer.endpoints.createOrUpdate, (state: CoordinatorState, action: PayloadAction<{ task: Task, message: string }>) => {
+            const newtask = action.payload.task
+            state.boards = state.boards.map(el => ({
+                ...el,
+                Status: el.Status?.map(status => ({
+                    ...status, Task: status.Task.map(task => {
+                        if (task.id == newtask.id) return newtask
+                        return task
+                    })
+                }))
+            }))
+            if (state.viewingBoard)
+                state.viewingBoard = {
+                    ...state.viewingBoard,
+                    Status: state.viewingBoard.Status?.map(status => ({
+                        ...status, Task: status.Task.map(task => {
+                            if (task.id == newtask.id) return newtask
+                            return task
+                        })
+                    }))
+                }
+            state.successMessage = action.payload.message
         })
     },
 })

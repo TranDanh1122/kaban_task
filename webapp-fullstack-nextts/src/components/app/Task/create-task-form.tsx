@@ -8,11 +8,11 @@ import { FieldArrayWithId, useFieldArray, useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useCreateOrUpdateTask } from "@/hooks/use-fetch-task";
 import { XIcon } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useAppCoordinator } from "@/hooks/useCoordinator";
+import { useCreateOrUpdateMutation } from "@/redux/actions/taskAPI";
 
 const formSchema = z.object({
     title: z.string().min(2).max(50),
@@ -25,7 +25,7 @@ const formSchema = z.object({
     status: z.string({ message: "You need to set a status of this task " })
 })
 export default function CreateTaskForm(): React.JSX.Element {
-    const { state, isOpen, dispatch } = useDialog()
+    const { isOpen, dispatch } = useDialog()
     const { viewingBoard, viewingTask: task } = useAppCoordinator()
     const status = viewingBoard?.Status
 
@@ -38,10 +38,12 @@ export default function CreateTaskForm(): React.JSX.Element {
             status: task?.statusId ?? ''
         },
     })
-    const createNewTask = useCreateOrUpdateTask()
-
+    const [createOrUpdateMutate, { isLoading }] = useCreateOrUpdateMutation()
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        createNewTask.mutate({ ...data, id: task?.id ?? "" })
+        createOrUpdateMutate({ ...data, id: task?.id ?? "" })
+        setTimeout(() => {
+            dispatch({ type: "TOOGLE", payload: { name: "TaskForm", state: false } })
+        }, 300)
     }
     const { fields, append, remove } = useFieldArray({
         control: form.control,
@@ -112,7 +114,7 @@ export default function CreateTaskForm(): React.JSX.Element {
                             </div>
                         ))}
                         {form.formState.errors.subtasks && <FormMessage>{form.formState.errors.subtasks.message}</FormMessage>}
-                        <Button disabled={createNewTask.isPending} className="bg-primary-100 text-primary-300 font-semibold hover:bg-primary-100 w-full rounded-3xl" type="button" onClick={() => append({ name: "", color: "#000000" })}>
+                        <Button disabled={isLoading} className="bg-primary-100 text-primary-300 font-semibold hover:bg-primary-100 w-full rounded-3xl" type="button" onClick={() => append({ name: "" })}>
                             + Add Column
                         </Button>
                     </fieldset>
@@ -145,16 +147,14 @@ export default function CreateTaskForm(): React.JSX.Element {
                             </FormItem>
                         )}
                     />
-                    <Button disabled={createNewTask.isPending} className="text-primary-100 bg-primary-300 font-semibold hover:bg-primary-300 w-full rounded-3xl" type="submit">
-                        {
-                            !createNewTask.isPending && <>
+                    <Button disabled={isLoading} className="text-primary-100 bg-primary-300 font-semibold hover:bg-primary-300 w-full rounded-3xl" type="submit">
+                        {!isLoading &&
+                            <>
                                 {!task && "Create New Task"}
                                 {task && "Save change"}
                             </>
                         }
-                        {
-                            createNewTask.isPending && <div className="border-white border-t-2 border-r-2 animate-spin rounded-full w-5 h-5"></div>
-                        }
+                        {isLoading && <div className="border-white border-t-2 border-r-2 animate-spin rounded-full w-5 h-5"></div>}
                     </Button>
                 </form>
             </Form>

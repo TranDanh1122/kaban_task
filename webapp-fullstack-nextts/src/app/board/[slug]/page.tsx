@@ -13,7 +13,8 @@ import { useAppCoordinator } from "@/hooks/useCoordinator"
 
 
 export default function BoardDetail() {
-    const {  viewingBoard: board } = useAppCoordinator()
+    const { viewingBoard: board } = useAppCoordinator()
+
     return <Layout>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2 px-4  w-full">
@@ -23,7 +24,7 @@ export default function BoardDetail() {
             </div>
         </header>
         <div className="w-full max-w-auto h-screen max-h-[calc(100vh-64px)] bg-primary-100/20 p-6 overflow-auto scrollbar-thin ">
-            <div className="flex w-max items-start gap-4">
+            <div className="flex w-auto items-start gap-4">
                 {board &&
                     <>
                         {board.Status && board.Status.map((el: Status) => <Status key={el.id} column={el} />)}
@@ -37,13 +38,15 @@ export default function BoardDetail() {
     </Layout >
 }
 const Toolbox = React.memo(({ className }: { className: string }) => {
+    const { setViewingTask, dispatch: coordinatorAction } = useAppCoordinator()
 
     const { dispatch } = useDialog()
     const handleEditBoard = () => {
-        dispatch({ type: "TOOGLE", payload: { name: "BoardForm", state: true } })
+        dispatch({ type: "TOOGLE", payload: { name: "BoardFormEdit", state: true } })
     }
     const handleCreateTask = () => {
         dispatch({ type: "TOOGLE", payload: { name: "TaskForm", state: true } })
+        coordinatorAction(setViewingTask(undefined))
     }
     return <>  <Popover>
         <PopoverTrigger asChild>

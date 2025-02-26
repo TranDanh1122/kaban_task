@@ -1,6 +1,6 @@
 'use client'
 
-import { boardAPISlice, useUpdateBoardMutation } from "@/redux/actions/boardAPI"
+import { boardAPISlice } from "@/redux/actions/boardAPI"
 import { CoordinatorState, resetMessage, setArchive, setViewingBoard, setViewingTask } from "@/redux/slicers/appCordinatorSlicer"
 import { AppDisPatch, RootState } from "@/redux/store"
 import { useDispatch, useSelector } from "react-redux"

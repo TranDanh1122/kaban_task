@@ -3,8 +3,6 @@ import React from "react"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useDialog } from "@/hooks/use-dialog"
-import { useQueryClient } from "@tanstack/react-query"
-import { usePathname } from "next/navigation"
 import { useAppCoordinator } from "@/hooks/useCoordinator"
 
 const Task = React.memo(({ task }: { task: Task }): React.JSX.Element => {
@@ -15,10 +13,11 @@ const Task = React.memo(({ task }: { task: Task }): React.JSX.Element => {
         return task.subtasks?.filter(el => el.status).length || 0
     }, [task.subtasks])
     const { dispatch } = useDialog()
-    const { viewingBoard } = useAppCoordinator()
+    const { dispatch: coordinatorAction, setViewingTask } = useAppCoordinator()
     const handleViewTask = React.useCallback(() => {
         dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: true } })
-    }, [viewingBoard])
+        coordinatorAction(setViewingTask(task))
+    }, [task])
     return <Card onClick={handleViewTask} className="cursor-pointer shadow-md">
         <CardHeader>
             <CardTitle className="heading-m hover:text-primary-300">{task.title}</CardTitle>

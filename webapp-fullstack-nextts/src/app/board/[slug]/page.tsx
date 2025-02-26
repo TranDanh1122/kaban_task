@@ -8,13 +8,12 @@ import { ListTodo, PencilRuler, Sparkle } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import Status, { StatusSkeleton } from "@/components/app/Status/status"
 import { useGetBoardBySlug } from "@/hooks/use-fetch-board"
-import { notFound, usePathname } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { useDialog } from "@/hooks/use-dialog"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 
 export default function BoardDetail({ params }: { params: { slug: string } }) {
     const { board, isLoading, isError } = useGetBoardBySlug(params.slug)
-    if (!isLoading && !board) return notFound()
     return <Layout>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2 px-4  w-full">
@@ -23,11 +22,11 @@ export default function BoardDetail({ params }: { params: { slug: string } }) {
                 {!isLoading && board && <span className="heading-xl">{board.title}</span>}
             </div>
         </header>
-        <ScrollArea className="w-full h-screen max-h-[calc(100vh-64px)] bg-primary-100/20 p-6">
-            <div className="flex items-start gap-4">
+        <div className="w-full max-w-auto h-screen max-h-[calc(100vh-64px)] bg-primary-100/20 p-6 overflow-auto scrollbar-thin ">
+            <div className="flex w-max items-start gap-4">
                 {isError && <div className="w-full h-full flex items-center justify-center font-semibold mt-20">Error when loading, please try again later</div>}
                 {isLoading && Array.from({ length: 4 }).map((el, index: number) => <StatusSkeleton key={index} />)}
-                {!isLoading && !isError &&
+                {!isLoading && !isError && board &&
                     <>
                         {board.Status && board.Status.map((el: Status) => <Status key={el.id} column={el} />)}
                         <Toolbox board={board} className="absolute bottom-6 right-6 size-14 p-3 rounded-full bg-primary-300 hover:bg-primary-200 text-primary-100 " />
@@ -35,7 +34,7 @@ export default function BoardDetail({ params }: { params: { slug: string } }) {
                 }
             </div>
 
-        </ScrollArea>
+        </div>
 
     </Layout >
 }

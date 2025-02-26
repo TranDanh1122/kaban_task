@@ -5,10 +5,10 @@ import Task, { TaskSkeleton } from "../Task/task"
 import { Skeleton } from "@/components/ui/skeleton"
 
 const Status = React.memo(({ column }: { column: Status }): React.JSX.Element => {
-    return <div className="w-1/4 h-full">
+    return <div className="w-1/4 min-w-[25%] h-full">
         <div className="flex items-center justify-start gap-2 mb-6">
-            <span className="size-5 rounded-full" style={{ backgroundColor: `${column.color}` }}></span>
-            <span className="text-sm text-secondary-100 font-bold">{column.name}</span>
+            <span className="size-5 min-w-5 rounded-full" style={{ backgroundColor: `${column.color}` }}></span>
+            <span className="text-sm text-secondary-100 font-bold  line-clamp-1 text-ellipsis">{column.name}</span>
         </div>
         <div className=" space-y-5">
             {

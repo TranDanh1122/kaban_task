@@ -105,8 +105,9 @@ function NavMain({ items }: {
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton className={`${item.isActive ? "bg-primary-300 text-white" : ""} 
                 font-medium hover:bg-primary-100 hover:text-primary-300  flex items-center h-fit`} tooltip={item.title}>
+                   {item.icon && <item.icon />}
               <Link onClick={() => item.action?.()} href={item.url} className="flex-1 flex items-center gap-2 w-full h-full">
-                {item.icon && <item.icon />}
+               
                 <span>{item.title}</span>
               </Link>
               <Popover>

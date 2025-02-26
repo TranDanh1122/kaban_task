@@ -22,10 +22,11 @@ const Layout = ({ children }: Props): React.JSX.Element => {
     React.useEffect(() => {
         queryClient.invalidateQueries({ queryKey: ['boards'] })
     }, [isArchive])
+
     return <>
         <SidebarProvider>
             <AppSidebar />
-            <SidebarInset>
+            <SidebarInset className="overflow-hidden">
                 {children}
             </SidebarInset>
         </SidebarProvider>

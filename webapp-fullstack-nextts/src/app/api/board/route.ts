@@ -13,13 +13,22 @@ export async function POST(req: NextRequest) {
         const oldSlug = slug ?? ""
         const newSlug = createSlug(title, boards)
         const queyParam = { slug_userId: { userId: token?.user?.id ?? "", slug: oldSlug } }
+        const existingStatusIds = await prisma.status.findMany({
+            where: { boardId: id }, // Lọc theo `boardId` hoặc điều kiện phù hợp
+            select: { id: true }
+        });
+        const existingIds = existingStatusIds.map(status => status.id);
+        const newIds = columns.map((status: Status) => status.id).filter((id: string) => id);
+        const idsToDelete = existingIds.filter(id => !newIds.includes(id));
         const board = await prisma.board.upsert({
             where: queyParam,
             update: {
                 title: title, slug: newSlug, Status: {
-                    updateMany: columns.map((status: Status) => ({
-                        where: { id: status.id }, // Cập nhật đúng Status theo ID
-                        data: { name: status.name, color: status.color },
+                    deleteMany: { id: { in: idsToDelete } },
+                    upsert: columns.map((status: Status) => ({
+                        where: { id: status.id ?? '' },
+                        create: { name: status.name, color: status.color },
+                        update: { name: status.name, color: status.color },
                     }))
                 }
             },

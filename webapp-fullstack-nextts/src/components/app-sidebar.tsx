@@ -53,7 +53,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }, [boardItems, session])
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar className="side" collapsible="icon" {...props}>
       <SidebarHeader>
         <Link href="/">
           <TeamSwitcher />

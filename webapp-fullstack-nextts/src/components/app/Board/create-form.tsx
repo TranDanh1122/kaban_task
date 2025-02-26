@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input"
 import { useDialog } from "@/hooks/use-dialog"
 import { XIcon } from "lucide-react"
 import { useCreateOrUpdateBoard } from "@/hooks/use-fetch-board"
+import { useAppCoordinator } from "@/hooks/useCoordinator"
+import { useCreateBoardMutation } from "@/redux/actions/boardAPI"
 
 const formSchema = z.object({
     title: z.string().min(2, { message: "Title atleast 2 character" }).max(50),
@@ -24,7 +26,7 @@ const formSchema = z.object({
 
 export default function CreateBoardForm(): React.JSX.Element {
     const { state, isOpen, dispatch } = useDialog()
-    const board: Board | undefined = state.find(el => el.name == "BoardForm")?.data as Board
+    const { viewingBoard: board } = useAppCoordinator()
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -35,9 +37,9 @@ export default function CreateBoardForm(): React.JSX.Element {
             }],
         }
     })
-    const createNewBoard = useCreateOrUpdateBoard()
+    const [createBoardMutation, { isLoading }] = useCreateBoardMutation()
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        createNewBoard.mutate({ ...data, id: board.id ?? "", slug : board.slug ?? "" })
+        createBoardMutation({ ...data, id: board?.id ?? "", slug: board?.slug ?? "" })
     }
 
     const { fields, append, remove } = useFieldArray({
@@ -117,21 +119,19 @@ export default function CreateBoardForm(): React.JSX.Element {
                             {form.formState.errors.columns && <FormMessage>{form.formState.errors.columns.message}</FormMessage>}
 
 
-                            <Button disabled={createNewBoard.isPending} className="bg-primary-100 text-primary-300 font-semibold hover:bg-primary-100 w-full rounded-3xl" type="button" onClick={() => append({ name: "", color: "#000000" })}>
+                            <Button disabled={isLoading} className="bg-primary-100 text-primary-300 font-semibold hover:bg-primary-100 w-full rounded-3xl" type="button" onClick={() => append({ name: "", color: "#000000" })}>
                                 + Add Column
                             </Button>
                         </fieldset>
 
-                        <Button disabled={createNewBoard.isPending} className="text-primary-100 bg-primary-300 font-semibold hover:bg-primary-300 w-full rounded-3xl" type="submit">
+                        <Button disabled={isLoading} className="text-primary-100 bg-primary-300 font-semibold hover:bg-primary-300 w-full rounded-3xl" type="submit">
                             {
-                                !createNewBoard.isPending && <>
+                                !isLoading && <>
                                     {!board && "Create New Board"}
                                     {board && "Save change"}
                                 </>
                             }
-                            {
-                                createNewBoard.isPending && <div className="border-white border-t-2 border-r-2 animate-spin rounded-full w-5 h-5"></div>
-                            }
+                            {isLoading && <div className="border-white border-t-2 border-r-2 animate-spin rounded-full w-5 h-5"></div>}
                         </Button>
                     </form>
                 </Form>

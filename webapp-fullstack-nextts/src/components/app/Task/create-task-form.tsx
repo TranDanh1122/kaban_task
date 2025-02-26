@@ -12,6 +12,7 @@ import { useCreateOrUpdateTask } from "@/hooks/use-fetch-task";
 import { XIcon } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useAppCoordinator } from "@/hooks/useCoordinator";
 
 const formSchema = z.object({
     title: z.string().min(2).max(50),
@@ -21,13 +22,12 @@ const formSchema = z.object({
             name: z.string().min(2, "Subtask title is required"),
         })
     ).optional(),
-    status: z.string({message: "You need to set a status of this task "})
+    status: z.string({ message: "You need to set a status of this task " })
 })
 export default function CreateTaskForm(): React.JSX.Element {
     const { state, isOpen, dispatch } = useDialog()
-    const taskData = state.find(el => el.name == "TaskForm")?.data;
-    const task: Task | undefined = taskData ? (taskData.task as Task) : undefined;
-    const status: Status[] | undefined = taskData ? (taskData.status as Status[]) : undefined;
+    const { viewingBoard, viewingTask: task } = useAppCoordinator()
+    const status = viewingBoard?.Status
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -35,14 +35,12 @@ export default function CreateTaskForm(): React.JSX.Element {
             title: task?.title ?? "",
             content: task?.content ?? "",
             subtasks: task?.subtasks ?? [],
-            status : task?.statusId ?? ''
+            status: task?.statusId ?? ''
         },
     })
     const createNewTask = useCreateOrUpdateTask()
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        console.log(1);
-
         createNewTask.mutate({ ...data, id: task?.id ?? "" })
     }
     const { fields, append, remove } = useFieldArray({
@@ -99,7 +97,7 @@ export default function CreateTaskForm(): React.JSX.Element {
                                             <FormControl>
                                                 <Input placeholder="Find a peace place..." {...field} />
                                             </FormControl>
-                                            <FormMessage className="text-accent-200 font-semibold"/>
+                                            <FormMessage className="text-accent-200 font-semibold" />
                                         </FormItem>
                                     )}
                                 />

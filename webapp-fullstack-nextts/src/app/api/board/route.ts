@@ -47,9 +47,20 @@ export async function GET(req: NextRequest) {
         if (!token) return NextResponse.json({ message: "Unauthorize" }, { status: 401 })
         const { searchParams } = new URL(req.url)
         const isArchive = searchParams.get("isArchive")
-        console.log(isArchive);
-
-        const boards = await prisma.board.findMany({ where: { userId: token.user?.id, isArchive: isArchive ? isArchive === "true" : false } })
+        const boards = await prisma.board.findMany({
+            where: { userId: token.user?.id, isArchive: isArchive ? isArchive === "true" : false },
+            include: {
+                Status: {
+                    include: {
+                        Task: {
+                            include: {
+                                subtasks: true
+                            }
+                        }
+                    }
+                }
+            }
+        })
         return NextResponse.json(boards, { status: 200 })
     } catch (error) {
         console.error(error)

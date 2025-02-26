@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Plus_Jakarta_Sans } from 'next/font/google'
 import { getServerSession } from "next-auth";
-import SessionProvider from "@/components/app/SessionProvider";
+import AppServiceProvider from "@/components/app/AppServiceProvider";
 import { authOptions } from "@/lib/authOption";
 import { Toaster } from "@/components/ui/sonner";
 import DialogContextProvider from "@/context/DialogContext";
-import QueryClientProvider from "@/components/app/QueryClientProvider";
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   display: 'swap',
@@ -24,18 +23,17 @@ export default async function RootLayout({
 }>) {
   const session = await getServerSession(authOptions);
   return (
-    <QueryClientProvider>
-      <DialogContextProvider>
-        <SessionProvider session={session} >
-          <html lang="en">
-            <body className={`${jakarta.className} antialiased tracking-wider`}>
+
+    <html lang="en">
+      <body className={`${jakarta.className} antialiased tracking-wider`}>
+          <DialogContextProvider>
+            <AppServiceProvider session={session} >
               {children}
               <Toaster />
+            </AppServiceProvider>
+          </DialogContextProvider>
+      </body>
+    </html>
 
-            </body>
-          </html>
-        </SessionProvider>
-      </DialogContextProvider>
-    </QueryClientProvider>
   );
 }

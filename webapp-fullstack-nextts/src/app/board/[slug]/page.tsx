@@ -1,35 +1,33 @@
 'use client'
 import React from "react"
 import Layout from "@/components/app/Layout"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { ListTodo, PencilRuler, Sparkle } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
-import Status, { StatusSkeleton } from "@/components/app/Status/status"
-import { useGetBoardBySlug } from "@/hooks/use-fetch-board"
-import { usePathname } from "next/navigation"
+import Status from "@/components/app/Status/status"
 import { useDialog } from "@/hooks/use-dialog"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { useAppCoordinator } from "@/hooks/useCoordinator"
 
-export default function BoardDetail({ params }: { params: { slug: string } }) {
-    const { board, isLoading, isError } = useGetBoardBySlug(params.slug)
+
+
+export default function BoardDetail() {
+    const {  viewingBoard: board } = useAppCoordinator()
     return <Layout>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2 px-4  w-full">
                 <SidebarTrigger className="-ml-1" />
                 <Separator orientation="vertical" className="mr-2 h-4" />
-                {!isLoading && board && <span className="heading-xl">{board.title}</span>}
+                {board && <span className="heading-xl">{board.title}</span>}
             </div>
         </header>
         <div className="w-full max-w-auto h-screen max-h-[calc(100vh-64px)] bg-primary-100/20 p-6 overflow-auto scrollbar-thin ">
             <div className="flex w-max items-start gap-4">
-                {isError && <div className="w-full h-full flex items-center justify-center font-semibold mt-20">Error when loading, please try again later</div>}
-                {isLoading && Array.from({ length: 4 }).map((el, index: number) => <StatusSkeleton key={index} />)}
-                {!isLoading && !isError && board &&
+                {board &&
                     <>
                         {board.Status && board.Status.map((el: Status) => <Status key={el.id} column={el} />)}
-                        <Toolbox board={board} className="absolute bottom-6 right-6 size-14 p-3 rounded-full bg-primary-300 hover:bg-primary-200 text-primary-100 " />
+                        <Toolbox className="absolute bottom-6 right-6 size-14 p-3 rounded-full bg-primary-300 hover:bg-primary-200 text-primary-100 " />
                     </>
                 }
             </div>
@@ -38,19 +36,14 @@ export default function BoardDetail({ params }: { params: { slug: string } }) {
 
     </Layout >
 }
-const Toolbox = React.memo(({ className, board }: { className: string, board: Board }) => {
-    const pathname = usePathname();
-    const slug = pathname.split("/").pop();
+const Toolbox = React.memo(({ className }: { className: string }) => {
+
     const { dispatch } = useDialog()
-
-    const handleEditBoard = React.useCallback(() => {
+    const handleEditBoard = () => {
         dispatch({ type: "TOOGLE", payload: { name: "BoardForm", state: true } })
-        dispatch({ type: "SETDATA", payload: { name: "BoardForm", data: board } })
-
-    }, [slug])
+    }
     const handleCreateTask = () => {
         dispatch({ type: "TOOGLE", payload: { name: "TaskForm", state: true } })
-        dispatch({ type: "SETDATA", payload: { name: "TaskForm", data: { status: board.Status } } })
     }
     return <>  <Popover>
         <PopoverTrigger asChild>

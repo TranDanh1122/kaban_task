@@ -34,6 +34,6 @@ declare global {
         avatar?: string,
         password?: string,
     }
-
+    type DIALOG = "TASK_FORM" | "TASK_VIEW" | "BOARD_FORM" | "CONFIRM"
 }
 export { }

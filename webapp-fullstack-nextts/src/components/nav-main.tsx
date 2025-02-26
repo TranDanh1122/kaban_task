@@ -3,7 +3,6 @@
 import { Archive, ArchiveRestore, BadgeX, Ellipsis, type LucideIcon } from "lucide-react"
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
 import Link from "next/link"
-import useFetchBoard, { useDeleteBoard, useUpdateBoard } from "@/hooks/use-fetch-board"
 import {
   Popover,
   PopoverContent,
@@ -12,7 +11,8 @@ import {
 import { Button } from "./ui/button"
 import { useDialog } from "@/hooks/use-dialog"
 import React from "react"
-import { useSearchParams } from "next/navigation"
+import { useDeleteBoardMutation, useUpdateBoardMutation } from "@/redux/actions/boardAPI"
+import { useAppCoordinator } from "@/hooks/useCoordinator"
 function NavMain({ items }: {
   items: {
     id: string,
@@ -30,35 +30,35 @@ function NavMain({ items }: {
     }[]
   }[]
 }) {
-  const { boards } = useFetchBoard()
+  const { boards, isArchive, dispatch: coordinatorAction, setViewingBoard } = useAppCoordinator()
   const { dispatch } = useDialog()
-  const updater = useUpdateBoard()
-  const deleter = useDeleteBoard()
+  const [updater, { isLoading: updaterLoading }] = useUpdateBoardMutation();
+  const [deleter, { isLoading: deleterLoading }] = useDeleteBoardMutation();
   React.useEffect(() => {
     dispatch({
       type: "SETDATA", payload: {
         name: "ConfirmDialog", data: {
-          isLoading: updater.isPending
+          isLoading: updaterLoading
         }
       }
     })
-  }, [updater.isPending])
+  }, [updaterLoading])
   React.useEffect(() => {
     dispatch({
       type: "SETDATA", payload: {
         name: "ConfirmDialog", data: {
-          isLoading: deleter.isPending
+          isLoading: deleterLoading
         }
       }
     })
-  }, [deleter.isPending])
-  const handleArchive = (title: string, slug: string) => {
+  }, [deleterLoading])
+  const handleArchive = (title: string, id: string) => {
     dispatch({
       type: "SETDATA", payload: {
         name: "ConfirmDialog", data: {
           title: "Archive this plan?", desc: `Are you sure you want to archive the ‘${title} plan? 
           This action will move this plan to Archive folder!`,
-          action: () => updater.mutate({ slug: slug, isArchive: true }),
+          action: () => updater({ id: id, isArchive: true }),
           actionTitle: 'Archive',
           primaryColor: "#635FC7"
         }
@@ -66,13 +66,13 @@ function NavMain({ items }: {
     })
     dispatch({ type: "TOOGLE", payload: { name: "ConfirmDialog", state: true } })
   }
-  const handleRestore = (title: string, slug: string) => {
+  const handleRestore = (title: string, id: string) => {
     dispatch({
       type: "SETDATA", payload: {
         name: "ConfirmDialog", data: {
           title: "Restore this plan?", desc: `Are you sure you want to restore the ‘${title} plan? 
           This action will move this plan to dashboard!`,
-          action: () => updater.mutate({ slug: slug, isArchive: false }),
+          action: () => updater({ id: id, isArchive: false }),
           actionTitle: 'Restore',
           primaryColor: "#635FC7"
         }
@@ -80,14 +80,14 @@ function NavMain({ items }: {
     })
     dispatch({ type: "TOOGLE", payload: { name: "ConfirmDialog", state: true } })
   }
-  const handleDelete = (title: string, slug: string) => {
+  const handleDelete = (title: string, id: string) => {
     dispatch({
       type: "SETDATA", payload: {
         name: "ConfirmDialog", data: {
           title: "Delete this plan?",
           desc: `Are you sure you want to delete the ‘${title} plan? 
           This action will remove this plan forever!`,
-          action: () => deleter.mutate({ slug: slug }),
+          action: () => deleter({ id: id }),
           actionTitle: 'Delete',
           primaryColor: "#EA5555"
         }
@@ -95,8 +95,7 @@ function NavMain({ items }: {
     })
     dispatch({ type: "TOOGLE", payload: { name: "ConfirmDialog", state: true } })
   }
-  const searchParams = useSearchParams();
-  const isArchive = searchParams.get("isArchive") === "true";
+
   return (
     <SidebarGroup className="pt-0">
       <SidebarGroupLabel>{isArchive ? "Archived Plan" : "All Plan"} ({boards?.length || 0})</SidebarGroupLabel>
@@ -105,17 +104,16 @@ function NavMain({ items }: {
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton className={`${item.isActive ? "bg-primary-300 text-white" : ""} 
                 font-medium hover:bg-primary-100 hover:text-primary-300  flex items-center h-fit`} tooltip={item.title}>
-                   {item.icon && <item.icon />}
-              <Link onClick={() => item.action?.()} href={item.url} className="flex-1 flex items-center gap-2 w-full h-full">
-               
+              {item.icon && <item.icon />}
+              <Link onClick={() => coordinatorAction(setViewingBoard(item.id))} href={item.url} className="flex-1 flex items-center gap-2 w-full h-full">
                 <span>{item.title}</span>
               </Link>
               <Popover>
                 <PopoverTrigger><Ellipsis /></PopoverTrigger>
                 <PopoverContent className="w-fit px-2 flex flex-col items-start font-semibold">
-                  {item.isArchive && <Button onClick={() => handleRestore(item.title, item.slug)} className="bg-white w-full justify-start hover:bg-slate-100 text-black"><ArchiveRestore /> Restore Plan</Button>}
-                  {!item.isArchive && <Button onClick={() => handleArchive(item.title, item.slug)} className="bg-white w-full justify-start hover:bg-slate-100 text-black"><Archive /> Archive Plan</Button>}
-                  <Button onClick={() => handleDelete(item.title, item.slug)} className="text-accent-200 bg-white w-full justify-start hover:bg-slate-100"><BadgeX /> Delete Plan</Button>
+                  {item.isArchive && <Button onClick={() => handleRestore(item.title, item.id)} className="bg-white w-full justify-start hover:bg-slate-100 text-black"><ArchiveRestore /> Restore Plan</Button>}
+                  {!item.isArchive && <Button onClick={() => handleArchive(item.title, item.id)} className="bg-white w-full justify-start hover:bg-slate-100 text-black"><Archive /> Archive Plan</Button>}
+                  <Button onClick={() => handleDelete(item.title, item.id)} className="text-accent-200 bg-white w-full justify-start hover:bg-slate-100"><BadgeX /> Delete Plan</Button>
                 </PopoverContent>
               </Popover>
             </SidebarMenuButton>

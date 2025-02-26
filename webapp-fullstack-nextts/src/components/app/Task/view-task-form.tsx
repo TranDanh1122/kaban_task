@@ -48,7 +48,6 @@ export default function ViewTaskForm(): React.JSX.Element {
     });
     const handleEdit = () => {
         dispatch({ type: "TOOGLE", payload: { name: "TaskForm", state: true } })
-        dispatch({ type: "SETDATA", payload: { name: "TaskForm", data: { task: task, status: status } } })
         setTimeout(() => {
             dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: false } })
         }, 300)

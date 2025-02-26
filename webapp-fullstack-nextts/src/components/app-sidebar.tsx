@@ -5,18 +5,16 @@ import NavMain from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar"
-import { usePathname } from "next/navigation"
 import { useDialog } from "@/hooks/use-dialog"
 import { useSession } from "next-auth/react"
-import useFetchBoard from "@/hooks/use-fetch-board"
 import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
 import Link from "next/link"
+import { useAppCoordinator } from "@/hooks/useCoordinator"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const pathName = usePathname()
   const { dispatch } = useDialog()
   const { data: session } = useSession()
-  const { boards, isLoading } = useFetchBoard()
+  const { boards, viewingBoard } = useAppCoordinator()
 
   const boardItems = React.useMemo(() => boards?.map((el: Board) => {
     return {
@@ -25,10 +23,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       slug: el.slug,
       icon: BookOpen,
       isArchive: el.isArchive,
-      isActive: pathName.split("/").some(item => item == el.slug),
+      isActive: el.id == viewingBoard?.id,
+      id : el.id
 
     }
-  }) || [], [boards, pathName])
+  }) || [], [boards])
   const data = React.useMemo(() => {
 
     return {
@@ -39,14 +38,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       navMain: [
         ...boardItems,
-        // {
-        //   title: "Create New Plan",
-        //   url: "#",
-        //   icon: PlusCircleIcon,
-        //   action: () => dispatch({
-        //     type: "TOOGLE", payload: { name: "BoardForm", state: true }
-        //   })
-        // }
       ],
 
     }
@@ -55,7 +46,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar className="side" collapsible="icon" {...props}>
       <SidebarHeader>
-        <Link href="/">
+        <Link href={"/"} >
           <TeamSwitcher />
         </Link>
       </SidebarHeader>
@@ -73,8 +64,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
           </SidebarMenu>
         </SidebarGroup>
-        {!isLoading && <NavMain items={data.navMain} />}
-        {isLoading && <div className="w-5 h-5 border-t-2 border-l-2 animate-spin border-primary-300 rounded-full mx-auto mt-[50%]"></div>}
+        <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

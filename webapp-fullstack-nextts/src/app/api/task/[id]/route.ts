@@ -46,9 +46,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET, cookieName: "kanban-session-token" })
         if (!token) return NextResponse.json({ message: "Unauthorize" }, { status: 401 })
         const query = { id: params.id }
-    
+
         if (neworder < oldorder) {
-            // Di chuyển lên: tăng thứ tự của các task có order >= neworder và < oldorder
             await prisma.task.updateMany({
                 where: {
                     statusId: statusId,
@@ -60,7 +59,6 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
                 },
             });
         } else if (neworder > oldorder) {
-            // Di chuyển xuống: giảm thứ tự của các task có order > oldorder và <= neworder
             await prisma.task.updateMany({
                 where: {
                     statusId: statusId,
@@ -75,7 +73,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         const task = await prisma.task.update({
             where: query,
             data: { order: neworder, statusId: statusId },
-            include: { subtasks: true }
+            include: { subtasks: true, file: true }
         })
 
         if (!task) return NextResponse.json({ message: "Invalid Data" }, { status: 400 })

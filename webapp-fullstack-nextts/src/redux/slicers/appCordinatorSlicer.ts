@@ -70,7 +70,7 @@ const appCordinatorSlicer = createSlice({
             })
             if (!taskToMove || !oldStatusId) return
 
-            let statuses = [...board.Status || []]
+            const statuses = [...board.Status || []]
 
             const oldStatusIndex = statuses.findIndex(s => s.id === oldStatusId)
 

@@ -4,13 +4,26 @@ declare global {
         name: string
         status: boolean
     }
+    interface File {
+        id: string,
+        name: string,
+        url: string
+    }
+    interface UploadFile {
+        path: string,
+        relativePath: string,
+        name: string,
+        size: string,
+        type: string
+    }
     interface Task {
         id: string,
         title: string,
         content: string,
         statusId: string,
         subtasks: Subtask[],
-        order: number
+        order: numberm
+        file: File[]
     }
 
     interface Status {

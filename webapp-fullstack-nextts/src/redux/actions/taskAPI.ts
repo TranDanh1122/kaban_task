@@ -26,11 +26,19 @@ export const taskApiSlicer = createApi({
                 method: "PUT",
                 data: data
             })
+        }),
+        patchTask: builder.mutation({
+            query: ({ data, id }) => ({
+                url: `task/${id}`,
+                method: "PATCH",
+                data: data
+            })
         })
     })
 })
 export const {
     useCreateTaskMutation,
     useDeleteTaskMutation,
-    useUpdateTaskMutation
+    useUpdateTaskMutation,
+    usePatchTaskMutation
 } = taskApiSlicer

@@ -1,11 +1,11 @@
 'use client'
 
 import { boardAPISlice } from "@/redux/actions/boardAPI"
-import { CoordinatorState, resetMessage, setArchive, setViewingBoard, setViewingTask } from "@/redux/slicers/appCordinatorSlicer"
+import { CoordinatorState, reOrder, resetMessage, setArchive, setViewingBoard, setViewingTask } from "@/redux/slicers/appCordinatorSlicer"
 import { AppDisPatch, RootState } from "@/redux/store"
 import { useDispatch, useSelector, shallowEqual } from "react-redux"
 
-export const useAppCoordinator = () => {
+export const useAppCoordinator = () => {    
     const { boards,
         loading,
         errorMessage,
@@ -14,10 +14,8 @@ export const useAppCoordinator = () => {
         viewingTask,
         isArchive, viewingBoardId } = useSelector((state: RootState) => state.coordinator as CoordinatorState , shallowEqual)
     const dispatch: AppDisPatch = useDispatch()
-    const fetchBoard = async (isArchive: boolean) => {
-        await dispatch(boardAPISlice.endpoints.getBoards.initiate(isArchive));
-    }
-
+    const fetchBoard = async (isArchive: boolean) =>  await dispatch(boardAPISlice.endpoints.getBoards.initiate(isArchive));
+    
     return {
         boards,
         loading,
@@ -32,6 +30,7 @@ export const useAppCoordinator = () => {
         setViewingBoard,
         setViewingTask,
         viewingBoardId,
-        resetMessage
+        resetMessage,
+        reOrder
     }
 }

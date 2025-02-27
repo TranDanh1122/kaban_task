@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
                 Status: {
                     include: {
                         Task: {
+                            orderBy:  { order: 'asc' },
                             include: {
                                 subtasks: true
                             }

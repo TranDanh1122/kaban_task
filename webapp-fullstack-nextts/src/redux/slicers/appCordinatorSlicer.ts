@@ -51,6 +51,95 @@ const appCordinatorSlicer = createSlice({
         resetMessage: (state: CoordinatorState) => {
             state.successMessage = ''
             state.errorMessage = ''
+        },
+        reOrder: (state: CoordinatorState, action: PayloadAction<{ data: { neworder: number, oldorder: number, statusId: string }, id: string }>) => {
+            const { data: { neworder, oldorder, statusId }, id } = action.payload
+
+            const board = state.boards.find(el => el.Status?.some(status => status.id == statusId))
+            if (!board) return
+
+            let oldStatusId: string | null = null
+            let taskToMove: Task = {} as Task
+
+            board.Status?.forEach(status => {
+                const task = status.Task.find(t => t.id === id)
+                if (task) {
+                    oldStatusId = status.id
+                    taskToMove = { ...task }
+                }
+            })
+            if (!taskToMove || !oldStatusId) return
+
+            let statuses = [...board.Status || []]
+
+            const oldStatusIndex = statuses.findIndex(s => s.id === oldStatusId)
+
+            const newStatusIndex = statuses.findIndex(s => s.id === statusId)
+            if (oldStatusIndex === -1 || newStatusIndex === -1) return
+
+            let oldTasks = [...statuses[oldStatusIndex].Task]
+
+            let newTasks = statusId === oldStatusId ? oldTasks : [...statuses[newStatusIndex].Task]
+
+            if (statusId === oldStatusId) {
+
+                taskToMove.order = neworder
+
+                if (neworder < oldorder) {
+                    // Kéo lên
+                    newTasks = newTasks.map(t =>
+                        t.id !== id && t.order >= neworder && t.order < oldorder
+                            ? { ...t, order: t.order + 1 }
+                            : t
+                    );
+                } else if (neworder > oldorder) {
+                    // Kéo xuống
+                    newTasks = newTasks.map(t =>
+                        t.id !== id && t.order > oldorder && t.order <= neworder
+                            ? { ...t, order: t.order - 1 }
+                            : t
+                    );
+                }
+
+                // Cập nhật task trong mảng
+                const taskIndex = newTasks.findIndex(t => t.id === id);
+                newTasks[taskIndex] = taskToMove;
+                newTasks.sort((a, b) => a.order - b.order);
+
+                // Cập nhật status
+                statuses[oldStatusIndex] = {
+                    ...statuses[oldStatusIndex],
+                    Task: newTasks
+                };
+            } else {
+                // Trường hợp 2: Khác status
+                // Xóa task khỏi status cũ
+                oldTasks = oldTasks.filter(t => t.id !== id);
+                oldTasks = oldTasks.map(t =>
+                    t.order > oldorder ? { ...t, order: t.order - 1 } : t
+                );
+
+                // Thêm task vào status mới
+                taskToMove.order = neworder;
+                newTasks = newTasks.map(t =>
+                    t.order >= neworder ? { ...t, order: t.order + 1 } : t
+                );
+                newTasks.push(taskToMove);
+                newTasks.sort((a, b) => a.order - b.order);
+
+                // Cập nhật cả hai status
+                statuses[oldStatusIndex] = {
+                    ...statuses[oldStatusIndex],
+                    Task: oldTasks
+                };
+                statuses[newStatusIndex] = {
+                    ...statuses[newStatusIndex],
+                    Task: newTasks
+                };
+            }
+
+            // Cập nhật board trong state
+            board.Status = statuses
         }
     },
     extraReducers: (builder) => {
@@ -143,7 +232,8 @@ const appCordinatorSlicer = createSlice({
 
             state.successMessage = action.payload.message
         })
+
     },
 })
-export const { setViewingBoard, setViewingTask, setBoards, setArchive, resetMessage } = appCordinatorSlicer.actions
+export const { setViewingBoard, setViewingTask, setBoards, setArchive, resetMessage, reOrder } = appCordinatorSlicer.actions
 export default appCordinatorSlicer.reducer

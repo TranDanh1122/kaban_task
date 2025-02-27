@@ -9,7 +9,7 @@ import CreateTaskForm from "./Task/create-task-form"
 import ViewTaskForm from "./Task/view-task-form"
 import { useAppCoordinator } from "@/hooks/useCoordinator";
 import { toast } from "sonner";
-import { notFound, usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { setViewingBoard } from "@/redux/slicers/appCordinatorSlicer";
 
 interface Props {

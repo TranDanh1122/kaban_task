@@ -11,18 +11,19 @@ const Status = React.memo(({ column }: { column: Status }): React.JSX.Element =>
         <Droppable key={column.id} droppableId={column.id}>
             {(provided, snapshot) => (
                 <ul ref={provided.innerRef} {...provided.droppableProps} className="w-1/4  min-w-[25%] h-screen max-h-[calc(100vh-110px)] flex-1 p-2"
-                    style={{ 
-                    listStyleType: 'none',
-                    borderRadius : "8px",
-                    backgroundColor: snapshot.isDraggingOver ? '#E4EBFA' : '',
-                    border :  snapshot.isDraggingOver ? '2px solid #635FC7' : ''}} >
+                    style={{
+                        listStyleType: 'none',
+                        borderRadius: "8px",
+                        backgroundColor: snapshot.isDraggingOver ? '#E4EBFA' : '',
+                        border: snapshot.isDraggingOver ? '2px solid #635FC7' : ''
+                    }} >
                     <div className="flex items-center justify-start gap-2 mb-6">
                         <span className="size-5 min-w-5 rounded-full" style={{ backgroundColor: `${column.color}` }}></span>
                         <span className="text-sm text-secondary-100 font-bold  line-clamp-1 text-ellipsis">{column.name}</span>
                     </div>
                     <div className=" space-y-5">
-                        {column.Task.map((el, index) => (
-                            <Draggable key={el.id} draggableId={el.id} index={index}>
+                        {column.Task.map((el) => (
+                            <Draggable key={el.id} draggableId={el.id} index={el.order}>
                                 {(provided) => (
                                     <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}
                                         style={{

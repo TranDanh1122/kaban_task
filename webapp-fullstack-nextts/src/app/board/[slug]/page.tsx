@@ -10,16 +10,18 @@ import { useDialog } from "@/hooks/use-dialog"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { useAppCoordinator } from "@/hooks/useCoordinator"
 import { DragDropContext } from "@hello-pangea/dnd"
-
-
+import { usePatchTaskMutation } from "@/redux/actions/taskAPI"
 
 export default function BoardDetail() {
-    const { viewingBoard: board } = useAppCoordinator()
+    const { viewingBoard: board, dispatch, reOrder } = useAppCoordinator()
+    const [updateMutate] = usePatchTaskMutation()
     const onDragEnd = (result: any) => {
-        const { destination, source } = result;
-        if (!destination || !source) return;    
-       
-      };
+        const { destination, source, draggableId } = result
+        if (!destination || !source) return
+        const data = { data: { neworder: destination.index, oldorder: source.index, statusId: destination.droppableId }, id: draggableId }
+        dispatch(reOrder(data))
+        //updateMutate(data)
+    }
     return <Layout>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2 px-4  w-full">
@@ -39,9 +41,9 @@ export default function BoardDetail() {
                         </>
                     }
                 </div>
-        </DragDropContext>
+            </DragDropContext>
 
-    </div>
+        </div>
 
     </Layout >
 }

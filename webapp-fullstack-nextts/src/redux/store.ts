@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 //@ts-expect-error this librabry @type not working at all
 import storage from 'redux-persist/lib/storage'
 import { boardAPISlice } from "./actions/boardAPI";
@@ -14,14 +14,14 @@ const config = {
     storage,
     whitelist: ['coordinator']
 }
-
-const localReducer = persistReducer(config, coordinatorReducer)
+const reducer = combineReducers({
+    coordinator: coordinatorReducer,
+    [boardAPISlice.reducerPath]: boardAPISlice.reducer,
+    [taskApiSlicer.reducerPath]: taskApiSlicer.reducer,
+})
+const localReducer = persistReducer(config, reducer)
 export const store = configureStore({
-    reducer: {
-        coordinator: localReducer,
-        [boardAPISlice.reducerPath]: boardAPISlice.reducer,
-        [taskApiSlicer.reducerPath]: taskApiSlicer.reducer
-    },
+    reducer: localReducer,
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false })
         .concat(boardAPISlice.middleware)
         .concat(taskApiSlicer.middleware)

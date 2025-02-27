@@ -9,7 +9,8 @@ declare global {
         title: string,
         content: string,
         statusId: string,
-        subtasks: Subtask[]
+        subtasks: Subtask[],
+        order: number
     }
 
     interface Status {

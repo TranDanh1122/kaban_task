@@ -34,12 +34,12 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     try {
         const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET, cookieName: "kanban-session-token" })
         if (!token) return NextResponse.json({ message: "Unauthorize" }, { status: 401 })
-        const { columns, title, id, slug } = await req.json()
+        const { columns, title } = await req.json()
         const boards = await prisma.board.findMany({ where: { userId: token?.user?.id ?? "" } })
         const newSlug = createSlug(title, boards)
-        const queyParam = { userId: token?.user?.id ?? "", id: id }
+        const queyParam = { userId: token?.user?.id ?? "", id: params.id }
         const existingStatusIds = await prisma.status.findMany({
-            where: { boardId: id }, // Lọc theo `boardId` hoặc điều kiện phù hợp
+            where: { boardId: params.id }, // Lọc theo `boardId` hoặc điều kiện phù hợp
             select: { id: true }
         });
         const existingIds = existingStatusIds.map(status => status.id);

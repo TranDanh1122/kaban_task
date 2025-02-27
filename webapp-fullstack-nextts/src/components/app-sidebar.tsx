@@ -14,7 +14,7 @@ import { useAppCoordinator } from "@/hooks/useCoordinator"
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { dispatch } = useDialog()
   const { data: session } = useSession()
-  const { boards, viewingBoard } = useAppCoordinator()
+  const { boards, viewingBoardId } = useAppCoordinator()
 
   const boardItems = React.useMemo(() => boards?.map((el: Board) => {
     return {
@@ -23,11 +23,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       slug: el.slug,
       icon: BookOpen,
       isArchive: el.isArchive,
-      isActive: el.id == viewingBoard?.id,
+      isActive: el.id == viewingBoardId,
       id : el.id
 
     }
-  }) || [], [boards])
+  }) || [], [boards, viewingBoardId])
   const data = React.useMemo(() => {
 
     return {

@@ -3,7 +3,7 @@
 import { boardAPISlice } from "@/redux/actions/boardAPI"
 import { CoordinatorState, resetMessage, setArchive, setViewingBoard, setViewingTask } from "@/redux/slicers/appCordinatorSlicer"
 import { AppDisPatch, RootState } from "@/redux/store"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch, useSelector, shallowEqual } from "react-redux"
 
 export const useAppCoordinator = () => {
     const { boards,
@@ -12,7 +12,7 @@ export const useAppCoordinator = () => {
         successMessage,
         viewingBoard,
         viewingTask,
-        isArchive, viewingBoardId } = useSelector((state: RootState) => state.coordinator as CoordinatorState)
+        isArchive, viewingBoardId } = useSelector((state: RootState) => state.coordinator as CoordinatorState , shallowEqual)
     const dispatch: AppDisPatch = useDispatch()
     const fetchBoard = async (isArchive: boolean) => {
         await dispatch(boardAPISlice.endpoints.getBoards.initiate(isArchive));

@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
-import { useCreateOrUpdateMutation, useDeleteTaskMutation } from "@/redux/actions/taskAPI";
+import { useDeleteTaskMutation, useUpdateTaskMutation } from "@/redux/actions/taskAPI";
 import { useAppCoordinator } from "@/hooks/useCoordinator";
 
 const formSchema = z.object({
@@ -36,10 +36,10 @@ export default function ViewTaskForm(): React.JSX.Element {
             status: task?.statusId ?? ''
         },
     })
-    const [updateTask, { isLoading }] = useCreateOrUpdateMutation()
+    const [updateTask, { isLoading }] = useUpdateTaskMutation()
     const [deleter, { isLoading: deleterLoading }] = useDeleteTaskMutation()
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        updateTask({ ...task, ...data, id: task?.id ?? "" })
+        updateTask({ data: { ...task, ...data }, id: task?.id })
         dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: false } })
     }
     const { fields } = useFieldArray({
@@ -48,7 +48,7 @@ export default function ViewTaskForm(): React.JSX.Element {
         shouldUnregister: false,
     });
     const handleEdit = () => {
-        dispatch({ type: "TOOGLE", payload: { name: "TaskForm", state: true } })
+        dispatch({ type: "TOOGLE", payload: { name: "TaskFormEdit", state: true } })
         dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: false } })
     }
 

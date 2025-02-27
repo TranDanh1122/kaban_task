@@ -12,7 +12,7 @@ import { XIcon } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useAppCoordinator } from "@/hooks/useCoordinator";
-import { useCreateOrUpdateMutation } from "@/redux/actions/taskAPI";
+import { useCreateOrUpdateMutation, useCreateTaskMutation, useUpdateTaskMutation } from "@/redux/actions/taskAPI";
 
 const formSchema = z.object({
     title: z.string().min(2).max(50),
@@ -24,7 +24,7 @@ const formSchema = z.object({
     ).optional(),
     status: z.string({ message: "You need to set a status of this task " })
 })
-export default function CreateTaskForm(): React.JSX.Element {
+export default function CreateTaskForm({ isCreate }: { isCreate: boolean }): React.JSX.Element {
     const { isOpen, dispatch } = useDialog()
     const { viewingBoard, viewingTask: task } = useAppCoordinator()
     const status = viewingBoard?.Status
@@ -38,18 +38,20 @@ export default function CreateTaskForm(): React.JSX.Element {
             status: task?.statusId ?? ''
         },
     })
-    const [createOrUpdateMutate, { isLoading }] = useCreateOrUpdateMutation()
+    const [createMutate, { isLoading: createLoading }] = useCreateTaskMutation()
+    const [updateMutate, { isLoading: updateLoading }] = useUpdateTaskMutation()
+    const mutate = isCreate ? createMutate : updateMutate
+    const isLoading = isCreate ? createLoading : updateLoading
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        createOrUpdateMutate({ ...data, id: task?.id ?? "" })
-        dispatch({ type: "TOOGLE", payload: { name: "TaskForm", state: false } })
-
+        mutate(isCreate ? { ...data, id: task?.id ?? "" } : { data: { ...data }, id: task?.id ?? '' })
+        dispatch({ type: "TOOGLE", payload: { name: isCreate ? "TaskForm" : "TaskFormEdit", state: false } })
     }
     const { fields, append, remove } = useFieldArray({
         control: form.control,
         name: "subtasks",
         shouldUnregister: false,
     });
-    return <Dialog onOpenChange={(open) => dispatch({ type: "TOOGLE", payload: { name: "TaskForm", state: open } })} open={isOpen("TaskForm")}>
+    return <Dialog onOpenChange={(open) => dispatch({ type: "TOOGLE", payload: { name: isCreate ? "TaskForm" : "TaskFormEdit", state: open } })} open={isOpen(isCreate ? "TaskForm" : "TaskFormEdit")}>
         <DialogTrigger asChild></DialogTrigger>
         <DialogContent>
             <DialogHeader>

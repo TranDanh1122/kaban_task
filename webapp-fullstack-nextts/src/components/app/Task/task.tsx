@@ -18,7 +18,7 @@ const Task = React.memo(({ task }: { task: Task }): React.JSX.Element => {
         dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: true } })
         coordinatorAction(setViewingTask(task))
     }, [task])
-    return <Card onClick={handleViewTask} className="cursor-pointer shadow-md">
+    return <Card onClick={handleViewTask} className="cursor-grab shadow-md">
         <CardHeader>
             <CardTitle className="heading-m hover:text-primary-300">{task.title}</CardTitle>
             <CardDescription className="text-[12px] font-bold text-secondary-100"> {finishedSubTask} of {subtasks} substasks</CardDescription>

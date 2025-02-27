@@ -18,7 +18,7 @@ interface Props {
 
 const Layout = ({ children }: Props): React.JSX.Element => {
     const { isOpen } = useDialog()
-    const {boards, errorMessage, successMessage, isArchive, fetchBoard, dispatch, setArchive, resetMessage } = useAppCoordinator()
+    const { boards, errorMessage, successMessage, isArchive, fetchBoard, dispatch, setArchive, resetMessage } = useAppCoordinator()
     React.useEffect(() => { //error message
         if (errorMessage) {
             toast.error(errorMessage, { style: { color: "red" } })
@@ -42,16 +42,17 @@ const Layout = ({ children }: Props): React.JSX.Element => {
 
     const pathnames = usePathname()
     React.useLayoutEffect(() => {
-        if (pathnames == "/") dispatch(setViewingBoard(""))
+        if (pathnames == "/") {
+            dispatch(setViewingBoard(""))
+            return
+        }
         const slug = pathnames.split("/").pop()
         if (slug) {
             if (boards.find(el => el.slug === slug)) {
                 dispatch(setViewingBoard(boards.find(el => el.slug === slug)?.id ?? ""))
-            } else {
-                return notFound()
             }
         }
-    }, [pathnames])
+    }, [pathnames, boards])
     return <>
         <SidebarProvider>
             <AppSidebar />
@@ -62,7 +63,8 @@ const Layout = ({ children }: Props): React.JSX.Element => {
         {isOpen("BoardForm") && <CreateBoardForm isCreate={true} />}
         {isOpen("BoardFormEdit") && <CreateBoardForm isCreate={false} />}
         {isOpen("ConfirmDialog") && <ConfirmDialog />}
-        {isOpen("TaskForm") && <CreateTaskForm />}
+        {isOpen("TaskForm") && <CreateTaskForm isCreate={true} />}
+        {isOpen("TaskFormEdit") && <CreateTaskForm isCreate={false} />}
         {isOpen("TaskView") && <ViewTaskForm />}
 
     </>

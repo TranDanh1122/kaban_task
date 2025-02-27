@@ -13,3 +13,29 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
     }
 }
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+    try {
+        const { title, status, content, subtasks } = await req.json()
+        const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET, cookieName: "kanban-session-token" })
+        if (!token) return NextResponse.json({ message: "Unauthorize" }, { status: 401 })
+        const query = { id: params.id }
+        const task = await prisma.task.update({
+            where: query,
+            data: {
+                title: title,
+                content: content,
+                status: { connect: { id: status } },
+                subtasks: { deleteMany: {}, create: subtasks }
+            },
+            include: {
+                subtasks: true
+            }
+        })
+        if (!task) return NextResponse.json({ message: "Invalid Data" }, { status: 400 })
+        return NextResponse.json({ task: task, message: "Update Task Success" }, { status: 200 })
+    } catch (error) {
+        console.error(error);
+
+        return NextResponse.json({ message: "Internal server error" }, { status: 500 })
+    }
+}

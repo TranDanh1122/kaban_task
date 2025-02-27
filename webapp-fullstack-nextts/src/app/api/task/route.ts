@@ -5,19 +5,11 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
     try {
-        const { title, status, content, subtasks, id } = await req.json()
+        const { title, status, content, subtasks } = await req.json()
         const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET, cookieName: "kanban-session-token" })
         if (!token) return NextResponse.json({ message: "Unauthorize" }, { status: 401 })
-        const query = { id: id, statusId: status }
-        const task = await prisma.task.upsert({
-            where: query,
-            update: {
-                title: title,
-                content: content,
-                status: { connect: { id: status } },
-                subtasks: { deleteMany: {}, create: subtasks }
-            },
-            create: {
+        const task = await prisma.task.create({
+            data: {
                 title: title,
                 content: content,
                 subtasks: { create: subtasks },
@@ -28,7 +20,7 @@ export async function POST(req: NextRequest) {
             }
         })
         if (!task) return NextResponse.json({ message: "Invalid Data" }, { status: 400 })
-        return NextResponse.json({ task: task, message: id ? "Update Task Success" : "Create Task Success" }, { status: 200 })
+        return NextResponse.json({ task: task, message: "Create Task Success" }, { status: 200 })
     } catch (error) {
         console.error(error);
 

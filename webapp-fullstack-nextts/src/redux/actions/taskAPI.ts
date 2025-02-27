@@ -5,9 +5,9 @@ export const taskApiSlicer = createApi({
     baseQuery: axiosBaseQuery(),
     refetchOnFocus: false,
     refetchOnReconnect: true,
-    refetchOnMountOrArgChange : false,
+    refetchOnMountOrArgChange: false,
     endpoints: (builder) => ({
-        createOrUpdate: builder.mutation({
+        createTask: builder.mutation({
             query: (data) => ({
                 url: `task`,
                 method: "POST",
@@ -15,15 +15,22 @@ export const taskApiSlicer = createApi({
             }),
         }),
         deleteTask: builder.mutation({
-            query: (data) => ({
-                url: `task`,
-                method: "POST",
-                data: data
+            query: (id) => ({
+                url: `task/${id}`,
+                method: "DELETE",
             }),
+        }),
+        updateTask: builder.mutation({
+            query: ({ data, id }) => ({
+                url: `task/${id}`,
+                method: "PUT",
+                data: data
+            })
         })
     })
 })
 export const {
-    useCreateOrUpdateMutation,
-    useDeleteTaskMutation
+    useCreateTaskMutation,
+    useDeleteTaskMutation,
+    useUpdateTaskMutation
 } = taskApiSlicer

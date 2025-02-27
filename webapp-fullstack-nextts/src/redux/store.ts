@@ -8,9 +8,11 @@ import persistReducer from "redux-persist/es/persistReducer";
 import persistStore from "redux-persist/es/persistStore";
 import coordinatorReducer from "./slicers/appCordinatorSlicer"
 import { taskApiSlicer } from "./actions/taskAPI";
+
 const config = {
     key: "kanban-task-client-data",
-    storage
+    storage,
+    whitelist: ['coordinator']
 }
 
 const localReducer = persistReducer(config, coordinatorReducer)
@@ -20,8 +22,12 @@ export const store = configureStore({
         [boardAPISlice.reducerPath]: boardAPISlice.reducer,
         [taskApiSlicer.reducerPath]: taskApiSlicer.reducer
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }).concat(boardAPISlice.middleware).concat(taskApiSlicer.middleware)
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false })
+        .concat(boardAPISlice.middleware)
+        .concat(taskApiSlicer.middleware)
 })
+
 export const persiststore = persistStore(store)
+
 export type RootState = ReturnType<typeof store.getState>
 export type AppDisPatch = typeof store.dispatch

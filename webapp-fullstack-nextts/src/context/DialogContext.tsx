@@ -10,6 +10,7 @@ const initData: Dialog[] = [
     { name: "BoardForm", status: false },
     { name: "BoardFormEdit", status: false },
     { name: "TaskForm", status: false },
+    { name: "TaskFormEdit", status: false },
     { name: "TaskView", status: false },
     { name: "ConfirmDialog", status: false }
 ]

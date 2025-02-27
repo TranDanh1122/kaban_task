@@ -20,7 +20,7 @@ export default function BoardDetail() {
         if (!destination || !source) return
         const data = { data: { neworder: destination.index, oldorder: source.index, statusId: destination.droppableId }, id: draggableId }
         dispatch(reOrder(data))
-        //updateMutate(data)
+        updateMutate(data)
     }
     return <Layout>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">

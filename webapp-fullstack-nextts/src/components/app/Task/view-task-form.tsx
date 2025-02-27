@@ -58,7 +58,10 @@ export default function ViewTaskForm(): React.JSX.Element {
                 name: "ConfirmDialog", data: {
                     title: "Delete this task?",
                     desc: `Are you sure you want to delete the ‘${task?.title} task? This action will remove this task forever!`,
-                    action: () => deleter(task?.id || ""),
+                    action: () => {
+                        deleter(task?.id || "")
+                        dispatch({ type: "TOOGLE", payload: { name: "TaskView", state: false } })
+                     },
                     actionTitle: 'Delete',
                     primaryColor: "#EA5555"
                 }

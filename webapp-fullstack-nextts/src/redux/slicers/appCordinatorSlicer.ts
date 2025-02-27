@@ -86,14 +86,12 @@ const appCordinatorSlicer = createSlice({
                 taskToMove.order = neworder
 
                 if (neworder < oldorder) {
-                    // Kéo lên
                     newTasks = newTasks.map(t =>
                         t.id !== id && t.order >= neworder && t.order < oldorder
                             ? { ...t, order: t.order + 1 }
                             : t
                     );
                 } else if (neworder > oldorder) {
-                    // Kéo xuống
                     newTasks = newTasks.map(t =>
                         t.id !== id && t.order > oldorder && t.order <= neworder
                             ? { ...t, order: t.order - 1 }
@@ -101,33 +99,24 @@ const appCordinatorSlicer = createSlice({
                     );
                 }
 
-                // Cập nhật task trong mảng
                 const taskIndex = newTasks.findIndex(t => t.id === id);
                 newTasks[taskIndex] = taskToMove;
                 newTasks.sort((a, b) => a.order - b.order);
-
-                // Cập nhật status
                 statuses[oldStatusIndex] = {
                     ...statuses[oldStatusIndex],
                     Task: newTasks
                 };
             } else {
-                // Trường hợp 2: Khác status
-                // Xóa task khỏi status cũ
                 oldTasks = oldTasks.filter(t => t.id !== id);
                 oldTasks = oldTasks.map(t =>
                     t.order > oldorder ? { ...t, order: t.order - 1 } : t
                 );
-
-                // Thêm task vào status mới
                 taskToMove.order = neworder;
                 newTasks = newTasks.map(t =>
                     t.order >= neworder ? { ...t, order: t.order + 1 } : t
                 );
                 newTasks.push(taskToMove);
                 newTasks.sort((a, b) => a.order - b.order);
-
-                // Cập nhật cả hai status
                 statuses[oldStatusIndex] = {
                     ...statuses[oldStatusIndex],
                     Task: oldTasks
@@ -137,8 +126,6 @@ const appCordinatorSlicer = createSlice({
                     Task: newTasks
                 };
             }
-
-            // Cập nhật board trong state
             board.Status = statuses
         }
     },
@@ -181,16 +168,18 @@ const appCordinatorSlicer = createSlice({
             const newtask = action.payload.task
             state.boards = state.boards.map(el => ({
                 ...el,
-                Status: el.Status ? el.Status.map(status => ({
-                    ...status, Task: { ...status.Task, newtask }
-                })) : []
+                Status: el.Status ? el.Status.map(status => {
+                    if (status.id == newtask.statusId) return { ...status, Task: [...status.Task, newtask] }
+                    return status
+                }) : []
             }))
             if (state.viewingBoard) {
                 state.viewingBoard = {
                     ...state.viewingBoard,
-                    Status: state.viewingBoard.Status ? state.viewingBoard.Status.map(status => ({
-                        ...status, Task: { ...status.Task, newtask }
-                    })) : []
+                    Status: state.viewingBoard.Status ? state.viewingBoard.Status.map(status => {
+                        if (status.id == newtask.statusId) return { ...status, Task: [...status.Task, newtask] }
+                        return status
+                    }) : []
                 }
             }
             state.successMessage = action.payload.message
@@ -199,16 +188,18 @@ const appCordinatorSlicer = createSlice({
             const updatedTask = action.payload.task
             state.boards = state.boards.map(el => ({
                 ...el,
-                Status: el.Status ? el.Status.map(status => ({
-                    ...status, Task: status.Task.map(el => el.id === updatedTask.id ? updatedTask : el)
-                })) : []
+                Status: el.Status ? el.Status.map(status => {
+                    if (status.id == updatedTask.statusId) return { ...status, Task: status.Task.map(el => el.id === updatedTask.id ? updatedTask : el) }
+                    return status
+                }) : []
             }))
             if (state.viewingBoard) {
                 state.viewingBoard = {
                     ...state.viewingBoard,
-                    Status: state.viewingBoard.Status ? state.viewingBoard.Status.map(status => ({
-                        ...status, Task: status.Task.map(el => el.id === updatedTask.id ? updatedTask : el)
-                    })) : []
+                    Status: state.viewingBoard.Status ? state.viewingBoard.Status.map(status => {
+                        if (status.id == updatedTask.statusId) return { ...status, Task: status.Task.map(el => el.id === updatedTask.id ? updatedTask : el) }
+                        return status
+                    }) : []
                 }
             }
             state.successMessage = action.payload.message
@@ -217,16 +208,18 @@ const appCordinatorSlicer = createSlice({
             const deletedTask = action.payload.task
             state.boards = state.boards.map(el => ({
                 ...el,
-                Status: el.Status ? el.Status.map(status => ({
-                    ...status, Task: status.Task ? status.Task.filter(task => task.id !== deletedTask.id) : []
-                })) : []
+                Status: el.Status ? el.Status.map(status => {
+                    if (status.id == deletedTask.statusId) return { ...status, Task: status.Task.filter(el => el.id !== deletedTask.id) }
+                    return status
+                }) : []
             }))
             if (state.viewingBoard) {
                 state.viewingBoard = {
                     ...state.viewingBoard,
-                    Status: state.viewingBoard.Status ? state.viewingBoard.Status.map(status => ({
-                        ...status, Task: status.Task ? status.Task.filter(task => task.id !== deletedTask.id) : []
-                    })) : []
+                    Status: state.viewingBoard.Status ? state.viewingBoard.Status.map(status => {
+                        if (status.id == deletedTask.statusId) return { ...status, Task: status.Task.filter(el => el.id !== deletedTask.id) }
+                        return status
+                    }) : []
                 }
             }
 

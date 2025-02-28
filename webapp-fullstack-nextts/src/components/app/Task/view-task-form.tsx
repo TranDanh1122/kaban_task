@@ -88,8 +88,8 @@ export default function ViewTaskForm(): React.JSX.Element {
                 <Popover>
                     <PopoverTrigger className=""><Ellipsis /></PopoverTrigger>
                     <PopoverContent className="w-fit px-2 flex flex-col items-start font-semibold">
-                        <Button onClick={() => handleEdit()} className="bg-white w-full hover:bg-slate-100 justify-start text-black"><Edit className="block" /> Edit Task</Button>
-                        <Button onClick={() => handleDelete()} className="text-accent-200 w-full bg-white justify-start hover:bg-slate-100"><BadgeX /> Delete Task</Button>
+                        <Button onClick={() => handleEdit()} className="bg-white dark:bg-inherit w-full hover:bg-slate-100 justify-start text-black dark:text-inherit"><Edit className="block" /> Edit Task</Button>
+                        <Button onClick={() => handleDelete()} className="text-accent-200 w-full bg-white dark:bg-inherit justify-start hover:bg-slate-100"><BadgeX /> Delete Task</Button>
                     </PopoverContent>
                 </Popover>
             </div>

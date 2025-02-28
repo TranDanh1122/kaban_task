@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { usePathname, useSearchParams } from "next/navigation";
 import { setViewingBoard } from "@/redux/slicers/appCordinatorSlicer";
 import SettingDialog from "./Setting/setting";
+import { useGetBoardsQuery } from "@/redux/actions/boardAPI";
 
 interface Props {
     children: React.ReactNode
@@ -19,7 +20,12 @@ interface Props {
 
 const Layout = ({ children }: Props): React.JSX.Element => {
     const { isOpen } = useDialog()
-    const { boards, errorMessage, successMessage, isArchive, fetchBoard, dispatch, setArchive, resetMessage } = useAppCoordinator()
+    const { boards, errorMessage, successMessage, isArchive, dispatch, setArchive, resetMessage } = useAppCoordinator()
+    const { data, refetch } = useGetBoardsQuery(isArchive);
+    React.useEffect(() => {
+      refetch();
+    }, [isArchive]);
+    
     React.useEffect(() => { //error message
         if (errorMessage) {
             toast.error(errorMessage, { style: { color: "red" } })
@@ -32,18 +38,17 @@ const Layout = ({ children }: Props): React.JSX.Element => {
             dispatch(resetMessage())
         }
     }, [successMessage])
-    React.useEffect(() => { //init data
-        fetchBoard(isArchive)
-    }, [isArchive])
+
     const searchParams = useSearchParams();
     const paramArchive = searchParams.get("isArchive") === "true";
     React.useEffect(() => { //handle view archived data
+     
         dispatch(setArchive(paramArchive))
     }, [paramArchive])
 
     const pathnames = usePathname()
     React.useLayoutEffect(() => {
-        if (pathnames == "/") {
+        if (pathnames == "/") {            
             dispatch(setViewingBoard(""))
             return
         }

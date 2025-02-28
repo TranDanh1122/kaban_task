@@ -24,7 +24,7 @@ const handleExtraReducer = <T>(builder: ActionReducerMapBuilder<CoordinatorState
         state.errorMessage = ""
         callback(state, action)
     }).addMatcher(endpoint.matchRejected, (state: CoordinatorState, action: PayloadAction<any>) => {
-        state.errorMessage = action.payload.error
+        state.errorMessage = action.payload
         state.successMessage = ""
     })
 }

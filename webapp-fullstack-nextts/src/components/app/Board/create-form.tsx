@@ -114,7 +114,7 @@ export default function CreateBoardForm({ isCreate }: { isCreate: boolean }): Re
 
                                     {/* Remove Button */}
                                     {fields.length > 1 && (
-                                        <Button type="button" onClick={() => remove(index)} className="bg-red-500 hover:bg-red-600">
+                                        <Button type="button" onClick={() => remove(index)} className="bg-red-500 hover:bg-red-600 text-inherit">
                                             <XIcon />
                                         </Button>
                                     )}
@@ -123,7 +123,7 @@ export default function CreateBoardForm({ isCreate }: { isCreate: boolean }): Re
                             {form.formState.errors.columns && <FormMessage>{form.formState.errors.columns.message}</FormMessage>}
 
 
-                            <Button disabled={isLoading} className="bg-primary-100 text-primary-300 font-semibold hover:bg-primary-100 w-full rounded-3xl" type="button" onClick={() => append({ name: "", color: "#000000" })}>
+                            <Button disabled={isLoading} className="bg-primary-100 dark:bg-secondary-300 text-primary-300 font-semibold hover:bg-primary-100 w-full rounded-3xl" type="button" onClick={() => append({ name: "", color: "#000000" })}>
                                 + Add Column
                             </Button>
                         </fieldset>

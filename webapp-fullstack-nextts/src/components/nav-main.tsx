@@ -111,9 +111,9 @@ function NavMain({ items }: {
               <Popover>
                 <PopoverTrigger><Ellipsis /></PopoverTrigger>
                 <PopoverContent className="w-fit px-2 flex flex-col items-start font-semibold">
-                  {item.isArchive && <Button onClick={() => handleRestore(item.title, item.id)} className="bg-white w-full justify-start hover:bg-slate-100 text-black"><ArchiveRestore /> Restore Plan</Button>}
-                  {!item.isArchive && <Button onClick={() => handleArchive(item.title, item.id)} className="bg-white w-full justify-start hover:bg-slate-100 text-black"><Archive /> Archive Plan</Button>}
-                  <Button onClick={() => handleDelete(item.title, item.id)} className="text-accent-200 bg-white w-full justify-start hover:bg-slate-100"><BadgeX /> Delete Plan</Button>
+                  {item.isArchive && <Button onClick={() => handleRestore(item.title, item.id)} className="bg-white dark:bg-inherit w-full justify-start hover:bg-slate-100 text-black dark:text-inherit"><ArchiveRestore /> Restore Plan</Button>}
+                  {!item.isArchive && <Button onClick={() => handleArchive(item.title, item.id)} className="bg-white dark:bg-inherit w-full justify-start hover:bg-slate-100 text-black dark:text-inherit"><Archive /> Archive Plan</Button>}
+                  <Button onClick={() => handleDelete(item.title, item.id)} className="text-accent-200 bg-white dark:bg-inherit w-full justify-start hover:bg-slate-100"><BadgeX /> Delete Plan</Button>
                 </PopoverContent>
               </Popover>
             </SidebarMenuButton>

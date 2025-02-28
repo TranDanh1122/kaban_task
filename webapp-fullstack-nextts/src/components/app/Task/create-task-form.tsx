@@ -135,7 +135,7 @@ export default function CreateTaskForm({ isCreate }: { isCreate: boolean }): Rea
                         </ScrollArea>
 
                         {form.formState.errors.subtasks && <FormMessage>{form.formState.errors.subtasks.message}</FormMessage>}
-                        <Button disabled={isLoading} className="bg-primary-100 text-primary-300 font-semibold hover:bg-primary-100 w-full rounded-3xl" type="button" onClick={() => append({ name: "" })}>
+                        <Button disabled={isLoading} className="bg-primary-100 dark:bg-secondary-300 text-primary-300 font-semibold hover:bg-primary-100 w-full rounded-3xl" type="button" onClick={() => append({ name: "" })}>
                             + Add Column
                         </Button>
                     </fieldset>

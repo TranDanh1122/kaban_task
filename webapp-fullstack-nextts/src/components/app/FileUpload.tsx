@@ -41,7 +41,7 @@ export function FileUploadForm({ form }: FileUploadFormProps) {
     return (
         <div className="space-y-2">
             <FormLabel htmlFor="file-upload" className="text-secondary-100 text-sm font-semibold block">File Upload</FormLabel>
-            <fieldset {...getRootProps({ className: 'dropzone' })} className="w-full bg-primary-100 px-5 py-10 rounded-md">
+            <fieldset {...getRootProps({ className: 'dropzone' })} className="w-full bg-primary-100 dark:bg-secondary-300 dark:border-white dark:border-2 dark:border-dashed px-5 py-10 rounded-md">
                 <input id="file-upload" {...getInputProps()} />
                 <div className="flex items-center gap-4">
                     {files?.map((field: FieldArrayWithId, index: number) => (

@@ -13,16 +13,15 @@ export const boardAPISlice = createApi({
 				url: `board?isArchive=${(isArchive)}`, method: 'get'
 			}),
 			providesTags: (result, error, isArchive) => [
-				{ type: 'Boards', id: isArchive?.toString() },
+				{ type: 'Boards', id: isArchive ? 1 : 0 },
 			],
-			keepUnusedDataFor: 300
+			
 		}),
 		getBoardById: builder.query({
 			query: (id: string) => ({ url: `board/${id}`, method: 'get' }),
 			providesTags: (result, error, id) => [
 				{ type: 'Board', id: id },
 			],
-			keepUnusedDataFor: 300
 		}),
 		createBoard: builder.mutation({
 			query: (data) => ({

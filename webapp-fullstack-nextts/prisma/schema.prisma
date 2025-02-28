@@ -10,11 +10,12 @@ datasource db {
 }
 
 model Files {
-    id     String  @id @default(cuid())
-    name   String
-    url    String
-    Task   Task?   @relation(fields: [taskId], references: [id])
-    taskId String?
+    id        String  @id @default(cuid())
+    name      String
+    url       String
+    public_id String
+    Task      Task?   @relation(fields: [taskId], references: [id])
+    taskId    String?
 }
 
 model Subtask {

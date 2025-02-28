@@ -132,6 +132,7 @@ const appCordinatorSlicer = createSlice({
     extraReducers: (builder) => {
         handleExtraReducer<Board[]>(builder, boardAPISlice.endpoints.getBoards, (state: CoordinatorState, action: PayloadAction<Board[]>) => {
             state.boards = action.payload
+            state.viewingBoard = action.payload.find(el => el.id == state.viewingBoardId)
             state.successMessage = "Fetching Plan Successfully"
         })
         handleExtraReducer<Board>(builder, boardAPISlice.endpoints.createBoard, (state: CoordinatorState, action: PayloadAction<Board>) => {

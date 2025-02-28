@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
             }
         })
         if (!task) return NextResponse.json({ message: "Invalid Data" }, { status: 400 })
-        return NextResponse.json({ task: task, message: "Create Task Success" }, { status: 200 })
+        return NextResponse.json({ task: task, message: "Create Task Success" }, { status: 201 })
     } catch (error) {
         console.error(error);
 

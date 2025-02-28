@@ -4,17 +4,19 @@ declare global {
         name: string
         status: boolean
     }
-    interface File {
-        id: string,
-        name: string,
-        url: string
-    }
+
     interface UploadFile {
         path: string,
         relativePath: string,
         name: string,
-        size: string,
-        type: string
+        size: number,
+        type: string,
+    }
+    interface File extends Partial<UploadFile> {
+        id: string,
+        name: string,
+        url: string,
+        public_id: string
     }
     interface Task {
         id: string,

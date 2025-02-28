@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/sidebar"
 import { signOut } from "next-auth/react"
 import Link from "next/link"
+import { useDialog } from "@/hooks/use-dialog"
 
 export function NavUser({
   user,
@@ -38,16 +39,14 @@ export function NavUser({
   user: Omit<User, 'id'>
 }) {
   const { isMobile } = useSidebar()
-
+  const { dispatch } = useDialog()
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
+            <SidebarMenuButton size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name || ''} />
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
@@ -96,7 +95,7 @@ export function NavUser({
                 <Bell />
                 Notifications
               </DropdownMenuItem> */}
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => dispatch({ type: "TOOGLE", payload: { name: "SettingDialog", state: true } })}>
                 <Settings />
                 Setting
               </DropdownMenuItem>
@@ -110,6 +109,6 @@ export function NavUser({
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
-    </SidebarMenu>
+    </SidebarMenu >
   )
 }

@@ -50,7 +50,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <TeamSwitcher />
         </Link>
       </SidebarHeader>
-      <SidebarContent className="bg-white">
+      <SidebarContent className="">
         <SidebarGroup className="pb-0">
           <SidebarMenu>
             <SidebarMenuItem >

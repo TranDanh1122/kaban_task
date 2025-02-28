@@ -11,6 +11,7 @@ import { useAppCoordinator } from "@/hooks/useCoordinator";
 import { toast } from "sonner";
 import { usePathname, useSearchParams } from "next/navigation";
 import { setViewingBoard } from "@/redux/slicers/appCordinatorSlicer";
+import SettingDialog from "./Setting/setting";
 
 interface Props {
     children: React.ReactNode
@@ -66,6 +67,8 @@ const Layout = ({ children }: Props): React.JSX.Element => {
         {isOpen("TaskForm") && <CreateTaskForm isCreate={true} />}
         {isOpen("TaskFormEdit") && <CreateTaskForm isCreate={false} />}
         {isOpen("TaskView") && <ViewTaskForm />}
+        <SettingDialog />
+
 
     </>
 }

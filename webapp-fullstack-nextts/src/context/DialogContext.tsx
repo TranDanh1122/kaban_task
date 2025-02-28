@@ -5,6 +5,7 @@ export type action = { type: "TOOGLE", payload: { name: string, state: boolean }
 interface Dialog {
     name: string,
     status: boolean,
+    data?: any
 }
 const initData: Dialog[] = [
     { name: "BoardForm", status: false },
@@ -12,7 +13,8 @@ const initData: Dialog[] = [
     { name: "TaskForm", status: false },
     { name: "TaskFormEdit", status: false },
     { name: "TaskView", status: false },
-    { name: "ConfirmDialog", status: false }
+    { name: "ConfirmDialog", status: false },
+    { name: "SettingDialog", status: false }
 ]
 const reducer = (state: Dialog[], action: action) => {
     switch (action.type) {

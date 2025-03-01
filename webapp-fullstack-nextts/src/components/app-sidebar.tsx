@@ -12,10 +12,9 @@ import Link from "next/link"
 import { useAppCoordinator } from "@/hooks/useCoordinator"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { dispatch } = useDialog()
-  const { data: session } = useSession()
+  const user = useSession().data?.user
   const { boards, viewingBoardId } = useAppCoordinator()
-
+  const { dispatch } = useDialog()
   const boardItems = React.useMemo(() => boards?.map((el: Board) => {
     return {
       title: el.title,
@@ -24,7 +23,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       icon: BookOpen,
       isArchive: el.isArchive,
       isActive: el.id == viewingBoardId,
-      id : el.id
+      id: el.id
 
     }
   }) || [], [boards, viewingBoardId])
@@ -32,16 +31,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     return {
       user: {
-        name: session?.user.name,
-        email: session?.user.email,
-        avatar: session?.user.avatar ?? "/avatars/shadcn.jpg",
+        name: user?.name,
+        email: user?.email,
+        image: user?.image ?? "/avatars/shadcn.jpg",
       },
       navMain: [
         ...boardItems,
       ],
 
     }
-  }, [boardItems, session])
+  }, [boardItems, user])
 
   return (
     <Sidebar className="side" collapsible="icon" {...props}>

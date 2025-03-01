@@ -14,7 +14,8 @@ const initData: Dialog[] = [
     { name: "TaskFormEdit", status: false },
     { name: "TaskView", status: false },
     { name: "ConfirmDialog", status: false },
-    { name: "SettingDialog", status: false }
+    { name: "SettingDialog", status: false },
+    { name: "AccountDialog", status: false }
 ]
 const reducer = (state: Dialog[], action: action) => {
     switch (action.type) {

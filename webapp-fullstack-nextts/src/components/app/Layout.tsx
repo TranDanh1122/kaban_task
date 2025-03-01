@@ -13,6 +13,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { setViewingBoard } from "@/redux/slicers/appCordinatorSlicer";
 import SettingDialog from "./Setting/setting";
 import { useGetBoardsQuery } from "@/redux/actions/boardAPI";
+import AccountDialog from "./Account/account";
 
 interface Props {
     children: React.ReactNode
@@ -73,7 +74,7 @@ const Layout = ({ children }: Props): React.JSX.Element => {
         {isOpen("TaskFormEdit") && <CreateTaskForm isCreate={false} />}
         {isOpen("TaskView") && <ViewTaskForm />}
         <SettingDialog />
-
+        {isOpen("AccountDialog") && <AccountDialog />}
 
     </>
 }

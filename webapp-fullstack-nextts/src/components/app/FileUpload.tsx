@@ -7,9 +7,11 @@ import { FormLabel, FormMessage } from "@/components/ui/form";
 import { useUploadFile } from "@/hooks/use-upload-file";
 import { FieldArrayWithId } from "react-hook-form";
 interface FileUploadFormProps {
-    form: UseFormReturn<any>;
+    form: UseFormReturn<any>,
+    maxFile: number,
+    multiple: boolean
 }
-export function FileUploadForm({ form }: FileUploadFormProps) {
+export function FileUploadForm({ form, maxFile, multiple }: FileUploadFormProps) {
     const { fields: files, remove: removeFile } = useFieldArray({
         control: form.control,
         name: "files",
@@ -36,7 +38,7 @@ export function FileUploadForm({ form }: FileUploadFormProps) {
         }
     };
 
-    const { getRootProps, getInputProps } = useUploadFile(onUpload, onReject);
+    const { getRootProps, getInputProps } = useUploadFile(maxFile, multiple, onUpload, onReject);
 
     return (
         <div className="space-y-2">

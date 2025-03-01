@@ -47,7 +47,7 @@ declare global {
         id: string,
         name?: string | null,
         email?: string | null,
-        avatar?: string,
+        image?: string | null,
         password?: string,
     }
     type DIALOG = "TASK_FORM" | "TASK_VIEW" | "BOARD_FORM" | "CONFIRM"

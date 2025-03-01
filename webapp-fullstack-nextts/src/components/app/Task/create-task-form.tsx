@@ -12,10 +12,11 @@ import { XIcon } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useAppCoordinator } from "@/hooks/useCoordinator";
-import { useCreateTaskMutation, useUpdateTaskMutation, useUpLoadFileMutation } from "@/redux/actions/taskAPI";
-import { ACCEPTED_FILE_TYPES, MAX_FILE_SIZE } from "@/hooks/use-upload-file";
+import { useCreateTaskMutation, useUpdateTaskMutation } from "@/redux/actions/taskAPI";
+import { ACCEPTED_FILE_TYPES, MAX_FILE_SIZE, useUploadFile } from "@/hooks/use-upload-file";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileUploadForm } from "../FileUpload";
+import { useUploadMutation } from "@/redux/actions/uploadAPI";
 const formSchema = z.object({
     title: z.string().min(2).max(50),
     content: z.string().min(2),
@@ -54,14 +55,16 @@ export default function CreateTaskForm({ isCreate }: { isCreate: boolean }): Rea
     const [createMutate, { isLoading: createLoading }] = useCreateTaskMutation()
     const [updateMutate, { isLoading: updateLoading }] = useUpdateTaskMutation()
     const mutate = isCreate ? createMutate : updateMutate
-    const [uploadFile] = useUpLoadFileMutation()
+    const [uploadFile] = useUploadMutation()
     const isLoading = isCreate ? createLoading : updateLoading
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         const postData = isCreate ? { ...data, id: task?.id ?? "" } : { data: { ...data }, id: task?.id ?? '' }
         mutate(postData).unwrap().then((res) => {
-            const formData = new FormData()
-            form.getValues("files")?.map((file: any, index: number) => formData.append(`${index}`, file.file))
-            uploadFile({ data: formData, id: res.task.id })
+            setTimeout(() => {
+                const formData = new FormData()
+                form.getValues("files")?.map((file: any, index: number) => formData.append(`${index}`, file.file))
+                uploadFile({ data: formData, id: res.task.id, type: "task" })
+            }, 300)
         })
         // dispatch({ type: "TOOGLE", payload: { name: isCreate ? "TaskForm" : "TaskFormEdit", state: false } })
     }
@@ -166,7 +169,7 @@ export default function CreateTaskForm({ isCreate }: { isCreate: boolean }): Rea
                             </FormItem>
                         )}
                     />
-                    <FileUploadForm form={form} />
+                    <FileUploadForm form={form} maxFile={3} multiple={true} />
                     <Button disabled={isLoading} className="text-primary-100 bg-primary-300 font-semibold hover:bg-primary-300 w-full rounded-3xl" type="submit">
                         {!isLoading &&
                             <>

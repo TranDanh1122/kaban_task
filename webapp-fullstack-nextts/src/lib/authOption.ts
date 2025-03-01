@@ -3,14 +3,17 @@ import { Session, NextAuthOptions } from "next-auth"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { JWT } from "next-auth/jwt"
-import GitHubProvider from "next-auth/providers/github";
-import TwitterProvider from "next-auth/providers/twitter";
+import GitHubProvider from "next-auth/providers/github"
+import TwitterProvider from "next-auth/providers/twitter"
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
+
 export const authOptions: NextAuthOptions = {
     debug: true,
     pages: {
         signIn: "/",
         signOut: "/login"
     },
+    adapter: PrismaAdapter(prisma),
     providers: [
         GitHubProvider({
             clientId: process.env.GITHUB_ID!,
@@ -20,7 +23,7 @@ export const authOptions: NextAuthOptions = {
                     id: profile.id.toString(),
                     name: profile.name ?? profile.login,
                     email: profile.email,
-                    avatar: profile.avatar_url,
+                    image: profile.avatar_url,
                 }
             },
         }),
@@ -33,7 +36,7 @@ export const authOptions: NextAuthOptions = {
                     id: profile.id_str,
                     name: profile.name,
                     email: profile.email,
-                    avatar: profile.profile_image_url_https.replace(
+                    image: profile.profile_image_url_https.replace(
                         /_normal\.(jpg|png|gif)$/,
                         ".$1"
                     ),
@@ -55,7 +58,6 @@ export const authOptions: NextAuthOptions = {
                     const user = await prisma.user.findUnique({
                         where: { email: credentials.email }
                     })
-
                     if (!user) return null
 
                     const isValidPass = await bcrypt.compare(credentials.password, user.password ?? "")
@@ -65,7 +67,7 @@ export const authOptions: NextAuthOptions = {
                         id: user.id,
                         email: user.email,
                         name: user.name,
-                        avatar: user.avatar
+                        image: user.image
                     }
                 } catch (e) {
                     return null
@@ -83,13 +85,23 @@ export const authOptions: NextAuthOptions = {
                 id: user.id,
                 email: user.email,
                 name: user.name,
-                avatar: user.avatar
+                image: user.image
             }
             return token
         },
         async session({ session, token }: { session: Session, token: JWT }) {
-            if (token.user)
-                session.user = token.user as User
+            if (token.user) {
+                const dbUser = await prisma.user.findUnique({
+                    where: { id: token.user.id },
+                    select: { password: false, id: true, name: true, email: true, image: true },
+                });
+                if (dbUser) {
+                    session.user = dbUser as User;
+                } else {
+                    session.user = null;
+                }
+            }
+
             return session
         }
     },

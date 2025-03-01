@@ -8,6 +8,7 @@ import persistReducer from "redux-persist/es/persistReducer";
 import persistStore from "redux-persist/es/persistStore";
 import coordinatorReducer from "./slicers/appCordinatorSlicer"
 import { taskApiSlicer } from "./actions/taskAPI";
+import { uploadApi } from "./actions/uploadAPI";
 
 const config = {
     key: "kanban-task-client-data",
@@ -18,6 +19,7 @@ const reducer = combineReducers({
     coordinator: coordinatorReducer,
     [boardAPISlice.reducerPath]: boardAPISlice.reducer,
     [taskApiSlicer.reducerPath]: taskApiSlicer.reducer,
+    [uploadApi.reducerPath]: uploadApi.reducer
 })
 const localReducer = persistReducer(config, reducer)
 export const store = configureStore({
@@ -25,6 +27,7 @@ export const store = configureStore({
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false })
         .concat(boardAPISlice.middleware)
         .concat(taskApiSlicer.middleware)
+        .concat(uploadApi.middleware)
 })
 
 export const persiststore = persistStore(store)

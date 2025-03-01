@@ -34,22 +34,12 @@ export const taskApiSlicer = createApi({
                 data: data
             })
         }),
-        upLoadFile: builder.mutation({
-            query: ({ data, id }) => ({
-                url: `task/${id}`,
-                method: "POST",
-                data: data,
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                }
-            })
-        })
+       
     })
 })
 export const {
     useCreateTaskMutation,
     useDeleteTaskMutation,
     useUpdateTaskMutation,
-    usePatchTaskMutation,
-    useUpLoadFileMutation
+    usePatchTaskMutation
 } = taskApiSlicer

@@ -23,8 +23,8 @@ const handleExtraReducer = <T>(builder: ActionReducerMapBuilder<CoordinatorState
         state.loading = false
         state.errorMessage = ""
         callback(state, action)
-    }).addMatcher(endpoint.matchRejected, (state: CoordinatorState, action: PayloadAction<any>) => {
-        state.errorMessage = action.payload
+    }).addMatcher(endpoint.matchRejected, (state: CoordinatorState, action: PayloadAction<Error>) => {        
+        state.errorMessage = action.payload?.message || ""
         state.successMessage = ""
     })
 }

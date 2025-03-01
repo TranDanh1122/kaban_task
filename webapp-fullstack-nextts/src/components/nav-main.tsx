@@ -11,7 +11,7 @@ import {
 import { Button } from "./ui/button"
 import { useDialog } from "@/hooks/use-dialog"
 import React from "react"
-import { useDeleteBoardMutation, useUpdateBoardMutation } from "@/redux/actions/boardAPI"
+import { useArchiveBoardMutation, useDeleteBoardMutation, useUpdateBoardMutation } from "@/redux/actions/boardAPI"
 import { useAppCoordinator } from "@/hooks/useCoordinator"
 function NavMain({ items }: {
   items: {
@@ -32,7 +32,7 @@ function NavMain({ items }: {
 }) {
   const { boards, isArchive, dispatch: coordinatorAction, setViewingBoard } = useAppCoordinator()
   const { dispatch } = useDialog()
-  const [updater, { isLoading: updaterLoading }] = useUpdateBoardMutation();
+  const [updater, { isLoading: updaterLoading }] = useArchiveBoardMutation();
   const [deleter, { isLoading: deleterLoading }] = useDeleteBoardMutation();
   React.useEffect(() => {
     dispatch({
@@ -87,7 +87,7 @@ function NavMain({ items }: {
           title: "Delete this plan?",
           desc: `Are you sure you want to delete the ‘${title} plan? 
           This action will remove this plan forever!`,
-          action: () => deleter({ id: id }),
+          action: () => { deleter({ id: id }); dispatch({ type: "TOOGLE", payload: { name: "ConfirmDialog", state: false } }) },
           actionTitle: 'Delete',
           primaryColor: "#EA5555"
         }

@@ -75,6 +75,21 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
     }
 }
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+    try {
+        const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET, cookieName: "kanban-session-token" })
+        if (!token) return NextResponse.json({ message: "Unauthorize" }, { status: 401 })
+        const { isArchive } = await req.json()
+        const board = await prisma.board.update({
+            where: { id: params.id },
+            data: { isArchive: isArchive }
+        })
+        return NextResponse.json(board, { status: 200 })
+    } catch (error) {
+        console.error(error)
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
+    }
+}
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
     try {
         const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET, cookieName: "kanban-session-token" })

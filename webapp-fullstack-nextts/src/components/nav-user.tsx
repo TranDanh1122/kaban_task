@@ -1,9 +1,7 @@
 "use client"
-
 import {
   Archive,
   BadgeCheck,
-  Bell,
   ChevronsUpDown,
   LogOut,
   Settings,
@@ -32,7 +30,12 @@ import {
 import { signOut } from "next-auth/react"
 import Link from "next/link"
 import { useDialog } from "@/hooks/use-dialog"
-
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 export function NavUser({
   user,
 }: {
@@ -53,7 +56,15 @@ export function NavUser({
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger> <span className="truncate text-xs">{user.email}</span></TooltipTrigger>
+                    <TooltipContent>
+                      <p>{user.email}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+               
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>

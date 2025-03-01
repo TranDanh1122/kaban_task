@@ -15,7 +15,7 @@ export const boardAPISlice = createApi({
 			providesTags: (result, error, isArchive) => [
 				{ type: 'Boards', id: isArchive ? 1 : 0 },
 			],
-			
+
 		}),
 		getBoardById: builder.query({
 			query: (id: string) => ({ url: `board/${id}`, method: 'get' }),
@@ -29,7 +29,7 @@ export const boardAPISlice = createApi({
 				method: "POST",
 				data: data
 			}),
-			invalidatesTags: (result) => result ? [{ type: 'Boards' }] : []
+			invalidatesTags: [{ type: 'Boards' }]
 		}),
 		updateBoard: builder.mutation({
 			query: (data) => ({
@@ -37,15 +37,23 @@ export const boardAPISlice = createApi({
 				method: "PUT",
 				data: data
 			}),
-			invalidatesTags: (result) => result ? [{ type: 'Boards' }] : []
+			invalidatesTags: [{ type: 'Boards' }]
 		}),
 		deleteBoard: builder.mutation({
 			query: (data) => ({
 				url: `board/${data.id}`,
 				method: 'DELETE',
 			}),
-			invalidatesTags: (result) => result ? [{ type: 'Boards' }] : []
-		})
+			invalidatesTags: [{ type: 'Boards' }]
+		}),
+		archiveBoard: builder.mutation({
+			query: (data) => ({
+				url: `board/${data.id}`,
+				method: 'PATCH',
+				data: data
+			}),
+			invalidatesTags: [{ type: 'Boards' }]
+		}),
 	})
 })
 export const {
@@ -53,5 +61,6 @@ export const {
 	useCreateBoardMutation,
 	useUpdateBoardMutation,
 	useDeleteBoardMutation,
-	useGetBoardByIdQuery
+	useGetBoardByIdQuery,
+	useArchiveBoardMutation
 } = boardAPISlice;

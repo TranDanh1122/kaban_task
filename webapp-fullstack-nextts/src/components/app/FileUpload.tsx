@@ -49,7 +49,7 @@ export function FileUploadForm({ form, maxFile, multiple }: FileUploadFormProps)
                     {files?.map((field: FieldArrayWithId, index: number) => (
                         <FileUpload
                             key={field.id}
-                            file={(form.getValues("files")?.[index] as UploadFile) ?? {}}
+                            file={(form.getValues("files")?.[index] as File) ?? {}}
                             onDelete={() => { form.trigger("files"); removeFile(index); }}
                         />
                     ))}
@@ -62,16 +62,16 @@ export function FileUploadForm({ form, maxFile, multiple }: FileUploadFormProps)
 }
 
 interface Props {
-    file: UploadFile,
+    file: File,
     onDelete: () => void,
 }
-export const FileUpload = ({ file, onDelete, data }: Props,): React.JSX.Element => {
+export const FileUpload = ({ file, onDelete }: Props,): React.JSX.Element => {
 
     return <div className="relative">
         <CircleX onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDelete() }} className="size-5 rounded-full text-white bg-accent-200 absolute right-0 top-0"></CircleX>
         <TooltipProvider>
             <Tooltip>
-                <TooltipTrigger> <FileArchive className="size-16"></FileArchive></TooltipTrigger>
+                <TooltipTrigger> <FileArchive onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(`${file.url ?? "#"}`, "_blank") }} className="size-16"></FileArchive></TooltipTrigger>
                 <TooltipContent>
                     <p>{file.name}</p>
                 </TooltipContent>

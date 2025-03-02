@@ -16,6 +16,8 @@ model Files {
     public_id    String
     relationType String?
     relationId   String?
+    Task         Task?   @relation(fields: [taskId], references: [id])
+    taskId       String?
 }
 
 model Subtask {
@@ -36,6 +38,7 @@ model Task {
     status    Status    @relation(fields: [statusId], references: [id], onDelete: Cascade)
     statusId  String
     subtasks  Subtask[]
+    files     Files[]
 }
 
 model Status {

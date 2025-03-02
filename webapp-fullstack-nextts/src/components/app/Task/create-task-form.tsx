@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useAppCoordinator } from "@/hooks/useCoordinator";
 import { useCreateTaskMutation, useUpdateTaskMutation } from "@/redux/actions/taskAPI";
-import { ACCEPTED_FILE_TYPES, MAX_FILE_SIZE, useUploadFile } from "@/hooks/use-upload-file";
+import { ACCEPTED_FILE_TYPES, MAX_FILE_SIZE } from "@/hooks/use-upload-file";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileUploadForm } from "../FileUpload";
 import { useUploadMutation } from "@/redux/actions/uploadAPI";
@@ -49,7 +49,7 @@ export default function CreateTaskForm({ isCreate }: { isCreate: boolean }): Rea
             content: task?.content ?? "",
             subtasks: task?.subtasks ?? [],
             status: task?.statusId ?? '',
-            files: task?.file ?? []
+            files: task?.files ?? []
         },
     })
     const [createMutate, { isLoading: createLoading }] = useCreateTaskMutation()
@@ -64,9 +64,9 @@ export default function CreateTaskForm({ isCreate }: { isCreate: boolean }): Rea
                 const formData = new FormData()
                 form.getValues("files")?.map((file: any, index: number) => formData.append(`${index}`, file.file))
                 uploadFile({ data: formData, id: res.task.id, type: "task" })
+                dispatch({ type: "TOOGLE", payload: { name: isCreate ? "TaskForm" : "TaskFormEdit", state: false } })
             }, 300)
         })
-        // dispatch({ type: "TOOGLE", payload: { name: isCreate ? "TaskForm" : "TaskFormEdit", state: false } })
     }
     const { fields, append, remove } = useFieldArray({
         control: form.control,

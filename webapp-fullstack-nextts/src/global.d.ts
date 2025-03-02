@@ -25,7 +25,7 @@ declare global {
         statusId: string,
         subtasks: Subtask[],
         order: numberm
-        file: File[]
+        files: File[]
     }
 
     interface Status {

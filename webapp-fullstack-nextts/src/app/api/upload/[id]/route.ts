@@ -39,13 +39,14 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
                 fs.writeFileSync(tempPath, fileBuffer)
                 try {
                     const result = await cloudinary.uploader.upload(tempPath, { folder: process.env.CLOUDINARY_UPLOAD_FOLDER })
-                    data.push({
+                    const item = {
                         name: value.name,
                         url: result.secure_url,
                         relationId: params.id,
                         relationType: type,
-                        public_id: result.public_id
-                    })
+                        public_id: result.public_id,
+                    }
+                    data.push(item)
                 } catch (error) {
                     console.error("Cloudinary upload error:", error);
                 } finally {
@@ -62,6 +63,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
                     url: file.url,
                     relationId: params.id,
                     relationType: type,
+                    taskId: type == "task" ? params.id : ""
                 })),
             })
             await Promise.all(oldFiles.map(file => cloudinary.uploader.destroy(file.public_id)));

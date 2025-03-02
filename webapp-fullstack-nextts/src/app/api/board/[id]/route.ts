@@ -45,6 +45,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         const existingIds = existingStatusIds.map(status => status.id);
         const newIds = columns.map((status: Status) => status.id).filter((id: string) => id);
         const idsToDelete = existingIds.filter(id => !newIds.includes(id));
+        
         const board = await prisma.board.update({
             where: queyParam,
             data: {

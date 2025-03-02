@@ -16,6 +16,7 @@ const formSchema = z.object({
     title: z.string().min(2, { message: "Title atleast 2 character" }).max(50),
     columns: z.array(
         z.object({
+            id: z.string().optional(),
             name: z.string().min(2, "Column name is required"),
             color: z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/, "Invalid color code"),
         })
@@ -32,6 +33,7 @@ export default function CreateBoardForm({ isCreate }: { isCreate: boolean }): Re
         defaultValues: {
             title: board?.title ?? "",
             columns: board?.Status ?? [{
+                id: "",
                 name: "",
                 color: "",
             }],

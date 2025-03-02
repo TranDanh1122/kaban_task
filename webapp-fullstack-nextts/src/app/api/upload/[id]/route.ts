@@ -9,11 +9,11 @@ cloudinary.config({
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
 })
-export const config = {
-    api: {
-        bodyParser: false,
-    },
-};
+// export const config = {
+//     api: {
+//         bodyParser: false,
+//     },
+// };
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
     if (!req.headers.get("content-type")?.includes("multipart/form-data")) {

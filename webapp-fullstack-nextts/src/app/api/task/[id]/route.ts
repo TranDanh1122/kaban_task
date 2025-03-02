@@ -73,7 +73,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         const task = await prisma.task.update({
             where: query,
             data: { order: neworder, statusId: statusId },
-            include: { subtasks: true, file: true }
+            include: { subtasks: true }
         })
 
         if (!task) return NextResponse.json({ message: "Invalid Data" }, { status: 400 })

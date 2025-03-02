@@ -23,7 +23,7 @@ const handleExtraReducer = <T>(builder: ActionReducerMapBuilder<CoordinatorState
         state.loading = false
         state.errorMessage = ""
         callback(state, action)
-    }).addMatcher(endpoint.matchRejected, (state: CoordinatorState, action: PayloadAction<Error>) => {        
+    }).addMatcher(endpoint.matchRejected, (state: CoordinatorState, action: PayloadAction<Error>) => {
         state.errorMessage = action.payload?.message || ""
         state.successMessage = ""
     })
@@ -38,6 +38,7 @@ const appCordinatorSlicer = createSlice({
     reducers: {
         setViewingBoard: (state: CoordinatorState, action: PayloadAction<string | undefined>) => {
             state.viewingBoardId = action.payload
+            state.viewingBoard = state.boards.find(el => el.id === action.payload)
         },
         setViewingTask: (state: CoordinatorState, action: PayloadAction<Task | undefined>) => {
             state.viewingTask = action.payload
@@ -126,7 +127,7 @@ const appCordinatorSlicer = createSlice({
                     Task: newTasks
                 };
             }
-            board.Status = statuses
+            if (state.viewingBoard) state.viewingBoard.Status = statuses
         }
     },
     extraReducers: (builder) => {
@@ -145,13 +146,11 @@ const appCordinatorSlicer = createSlice({
             console.log(action.payload);
 
             state.boards = state.boards.map(el => {
-                if (el.id == action.payload.id) {
-                    state.viewingBoardId = action.payload.id
-                    state.viewingBoard = action.payload
-                    return action.payload
-                }
+                if (el.id == action.payload.id) return action.payload
                 return el
             })
+            state.viewingBoardId = action.payload.id
+            state.viewingBoard = action.payload
             state.successMessage = "Update Plan Successfully"
         })
         handleExtraReducer<Board>(builder, boardAPISlice.endpoints.deleteBoard, (state: CoordinatorState, action: PayloadAction<Board>) => {
@@ -162,9 +161,7 @@ const appCordinatorSlicer = createSlice({
             state.viewingBoard = action.payload
             state.successMessage = "Fetch Plan Successfully"
         })
-        builder.addMatcher((action) => action.type === "coordinator/setViewingBoard", (state: CoordinatorState) => {
-            state.viewingBoard = state.boards.find(el => el.id === state.viewingBoardId)
-        })
+
         handleExtraReducer<{ task: Task, message: string }>(builder, taskApiSlicer.endpoints.createTask, (state: CoordinatorState, action: PayloadAction<{ task: Task, message: string }>) => {
             const newtask = action.payload.task
             state.boards = state.boards.map(el => ({
@@ -174,36 +171,85 @@ const appCordinatorSlicer = createSlice({
                     return status
                 }) : []
             }))
-            if (state.viewingBoard) {
-                state.viewingBoard = {
-                    ...state.viewingBoard,
-                    Status: state.viewingBoard.Status ? state.viewingBoard.Status.map(status => {
-                        if (status.id == newtask.statusId) return { ...status, Task: [...status.Task, newtask] }
-                        return status
-                    }) : []
-                }
-            }
+
+            const updatedBoard = {
+                ...state.viewingBoard,
+                Status: state.viewingBoard?.Status ? state.viewingBoard.Status.map(status => {
+                    if (status.id == newtask.statusId) return { ...status, Task: [...status.Task, newtask] }
+                    return status
+                }) : []
+            } as Board
+            state.viewingBoard = updatedBoard
             state.successMessage = action.payload.message
         })
         handleExtraReducer<{ task: Task, message: string }>(builder, taskApiSlicer.endpoints.updateTask, (state: CoordinatorState, action: PayloadAction<{ task: Task, message: string }>) => {
-            const updatedTask = action.payload.task
-            state.boards = state.boards.map(el => ({
-                ...el,
-                Status: el.Status ? el.Status.map(status => {
-                    if (status.id == updatedTask.statusId) return { ...status, Task: status.Task.map(el => el.id === updatedTask.id ? updatedTask : el) }
-                    return status
-                }) : []
-            }))
-            if (state.viewingBoard) {
-                state.viewingBoard = {
-                    ...state.viewingBoard,
-                    Status: state.viewingBoard.Status ? state.viewingBoard.Status.map(status => {
-                        if (status.id == updatedTask.statusId) return { ...status, Task: status.Task.map(el => el.id === updatedTask.id ? updatedTask : el) }
-                        return status
+            const updatedTask = action.payload.task;
+            const taskId = state.viewingTask?.id;
+            const prevStatusId = state.viewingTask?.statusId;
+            const newStatusId = updatedTask.statusId;
+
+            // Cập nhật danh sách board
+            state.boards = state.boards.map((board) => {
+                if (board.id !== state.viewingBoard?.id) return board; // Chỉ cập nhật board hiện tại
+
+                return {
+                    ...board,
+                    Status: board.Status ? board.Status.map((status) => {
+                        // Nếu task đổi status, xóa khỏi status cũ
+                        if (status.id === prevStatusId && prevStatusId !== newStatusId) {
+                            return {
+                                ...status,
+                                Task: status.Task.filter((task) => task.id !== taskId),
+                            };
+                        }
+
+                        // Nếu task đổi status, thêm vào status mới
+                        if (status.id === newStatusId) {
+                            // Nếu task đã tồn tại trong status này, chỉ cập nhật nội dung
+                            const taskExists = status.Task.some((task) => task.id === taskId);
+                            return {
+                                ...status,
+                                Task: taskExists
+                                    ? status.Task.map((task) => (task.id === taskId ? updatedTask : task))
+                                    : [...status.Task, updatedTask],
+                            };
+                        }
+
+                        return status;
                     }) : []
-                }
-            }
-            state.successMessage = action.payload.message
+                };
+            });
+
+            // Cập nhật viewingBoard
+            state.viewingBoard = {
+                ...state.viewingBoard,
+                Status: state.viewingBoard?.Status ? state.viewingBoard?.Status.map((status) => {
+                    // Nếu task đổi status, xóa khỏi status cũ
+                    if (status.id === prevStatusId && prevStatusId !== newStatusId) {
+                        return {
+                            ...status,
+                            Task: status.Task.filter((task) => task.id !== taskId),
+                        };
+                    }
+
+                    // Nếu task đổi status, thêm vào status mới
+                    if (status.id === newStatusId) {
+                        // Nếu task đã tồn tại trong status này, chỉ cập nhật nội dung
+                        const taskExists = status.Task.some((task) => task.id === taskId);
+                        return {
+                            ...status,
+                            Task: taskExists
+                                ? status.Task.map((task) => (task.id === taskId ? updatedTask : task))
+                                : [...status.Task, updatedTask],
+                        };
+                    }
+
+                    return status;
+                }) : []
+            } as Board
+
+            state.viewingTask = updatedTask;
+            state.successMessage = action.payload.message;
         })
         handleExtraReducer<{ task: Task, message: string }>(builder, taskApiSlicer.endpoints.deleteTask, (state: CoordinatorState, action: PayloadAction<{ task: Task, message: string }>) => {
             const deletedTask = action.payload.task
@@ -214,15 +260,15 @@ const appCordinatorSlicer = createSlice({
                     return status
                 }) : []
             }))
-            if (state.viewingBoard) {
-                state.viewingBoard = {
-                    ...state.viewingBoard,
-                    Status: state.viewingBoard.Status ? state.viewingBoard.Status.map(status => {
-                        if (status.id == deletedTask.statusId) return { ...status, Task: status.Task.filter(el => el.id !== deletedTask.id) }
-                        return status
-                    }) : []
-                }
-            }
+
+            const updatedBoard = {
+                ...state.viewingBoard,
+                Status: state.viewingBoard?.Status ? state.viewingBoard.Status.map(status => {
+                    if (status.id == deletedTask.statusId) return { ...status, Task: status.Task.filter(el => el.id !== deletedTask.id) }
+                    return status
+                }) : []
+            } as Board
+            state.viewingBoard = updatedBoard
 
             state.successMessage = action.payload.message
         })

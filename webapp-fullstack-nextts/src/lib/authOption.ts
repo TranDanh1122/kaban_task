@@ -13,7 +13,7 @@ export const authOptions: NextAuthOptions = {
         signIn: "/",
         signOut: "/login"
     },
-    adapter: PrismaAdapter(prisma),
+    // adapter: PrismaAdapter(prisma),
     providers: [
         GitHubProvider({
             clientId: process.env.GITHUB_ID!,

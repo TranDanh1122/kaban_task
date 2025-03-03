@@ -5,7 +5,6 @@ import bcrypt from "bcryptjs"
 import { JWT } from "next-auth/jwt"
 import GitHubProvider from "next-auth/providers/github"
 import TwitterProvider from "next-auth/providers/twitter"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
 
 export const authOptions: NextAuthOptions = {
     debug: true,

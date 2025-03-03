@@ -32,7 +32,7 @@ export function FileUploadForm({ form, maxFile, multiple }: FileUploadFormProps)
 
     const onReject = (fileRejections: any) => {
         if (fileRejections && fileRejections.length > 0) {
-            fileRejections[0].errors.forEach(el => {
+            fileRejections[0].errors.forEach((el:any) => {
                 form.setError("files", el);
             });
         }

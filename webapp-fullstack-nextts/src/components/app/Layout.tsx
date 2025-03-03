@@ -22,7 +22,7 @@ interface Props {
 const Layout = ({ children }: Props): React.JSX.Element => {
     const { isOpen } = useDialog()
     const { boards, errorMessage, successMessage, isArchive, dispatch, setArchive, resetMessage } = useAppCoordinator()
-    const { data, refetch } = useGetBoardsQuery(isArchive);
+    const {  refetch } = useGetBoardsQuery(isArchive);
     React.useEffect(() => {
       refetch();
     }, [isArchive]);

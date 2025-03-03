@@ -1,6 +1,6 @@
 'use client'
 import React from "react"
-import { Github, Twitter } from "lucide-react"
+import { Github } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { signIn } from "next-auth/react"
 import { toast } from "sonner"
@@ -10,7 +10,7 @@ const Oauth = React.memo((): React.JSX.Element => {
         try {
             await signIn("github")
         } catch (error) {
-            toast("Error when try to login with github")
+            toast(`Error when try to login with github ${error}`)
         }
 
     }
@@ -29,10 +29,10 @@ const Oauth = React.memo((): React.JSX.Element => {
             </svg>
             Login with Google
         </Button> */}
-        <Button onClick={() => signIn("twitter")} variant="outline" className="w-full">
+        {/* <Button onClick={() => signIn("twitter")} variant="outline" className="w-full">
             <Twitter width={24} className="text-black font-bold border-border border-2 size-six block p-1 max-w-none max-h-none rounded-full"></Twitter>
             Login with Twitter
-        </Button>
+        </Button> */}
     </>
 })
 Oauth.displayName = "Oauth"

@@ -52,7 +52,7 @@ export const StatusSkeleton = () => {
         </div>
         <div className=" space-y-5">
             {
-                Array.from({ length: 4 }).map(el => <TaskSkeleton key={v4()} />)
+                Array.from({ length: 4 }).map(() => <TaskSkeleton key={v4()} />)
             }
         </div>
 

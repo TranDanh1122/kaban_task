@@ -70,6 +70,7 @@ export const authOptions: NextAuthOptions = {
                         image: user.image
                     }
                 } catch (e) {
+                    console.error(e)
                     return null
 
                 }

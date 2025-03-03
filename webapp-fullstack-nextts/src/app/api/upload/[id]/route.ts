@@ -32,7 +32,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         const formData = await req.formData()
         const data: { name: string, url: string, relationId: string, relationType: string, public_id: string }[] = []
 
-        const uploadPromises = Array.from(formData.entries()).map(async ([_, value]) => {
+        const uploadPromises = Array.from(formData.entries()).map(async ([, value]) => {
             if (value instanceof File) {
                 const tempPath = path.join('/tmp', value.name)
                 const fileBuffer = Buffer.from(await value.arrayBuffer())

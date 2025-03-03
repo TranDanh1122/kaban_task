@@ -11,9 +11,7 @@ export async function GET(req: NextRequest) {
         const columns = await prisma.status.findMany({ where: { board: { id: boardID || "", userId: token.user?.id } } })
         return NextResponse.json(columns, { status: 200 })
     } catch (e) {
+        console.error(e)
         return NextResponse.json({ message: "Internal server error" }, { status: 500 })
     }
-}
-export async function POST(req: NextRequest) {
-
 }

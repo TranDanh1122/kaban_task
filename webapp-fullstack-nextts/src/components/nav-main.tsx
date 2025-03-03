@@ -11,7 +11,7 @@ import {
 import { Button } from "./ui/button"
 import { useDialog } from "@/hooks/use-dialog"
 import React from "react"
-import { useArchiveBoardMutation, useDeleteBoardMutation, useUpdateBoardMutation } from "@/redux/actions/boardAPI"
+import { useArchiveBoardMutation, useDeleteBoardMutation } from "@/redux/actions/boardAPI"
 import { useAppCoordinator } from "@/hooks/useCoordinator"
 function NavMain({ items }: {
   items: {

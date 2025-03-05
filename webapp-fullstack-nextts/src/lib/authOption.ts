@@ -23,6 +23,7 @@ export const authOptions: NextAuthOptions = {
                     name: profile.name ?? profile.login,
                     email: profile.email,
                     image: profile.avatar_url,
+                    provider: "github"
                 }
             },
         }),
@@ -80,17 +81,23 @@ export const authOptions: NextAuthOptions = {
         strategy: "jwt",
     },
     callbacks: {
-        async jwt({ token, user }: { token: JWT, user: User }) {
+        async jwt({ token, user, account }: { token: JWT, user: User, account: any }) {
             if (user) token.user = {
                 id: user.id,
                 email: user.email,
                 name: user.name,
                 image: user.image
             }
+            if (account) token.provider = account.provider
             return token
         },
         async session({ session, token }: { session: Session, token: JWT }) {
+
             if (token.user) {
+                if (token.provider) {
+                    session.user = token.user
+                    return session
+                }
                 const dbUser = await prisma.user.findUnique({
                     where: { id: token.user.id },
                     select: { password: false, id: true, name: true, email: true, image: true },

@@ -16,20 +16,19 @@ export async function middleware(req: NextRequest) {
         if (token && (pathname.startsWith("/login") || pathname.startsWith("/register"))) {
             return NextResponse.redirect(new URL("/", req.url));
         }
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Cookie": `kanban-session-token=${req.cookies.get("kanban-session-token")?.value}`, // Gửi cookie đi
-            },
-        })
+        // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
+        //     method: "GET",
+        //     headers: {
+        //         "Content-Type": "application/json",
+        //         "Cookie": `kanban-session-token=${req.cookies.get("kanban-session-token")?.value}`, // Gửi cookie đi
+        //     },
+        // })
 
-        if (response.status !== 200) {
-            const redirectResponse = NextResponse.redirect(new URL("/login", req.url));
-            redirectResponse.cookies.set("kanban-session-token", "", { expires: new Date(0), path: "/" });
-            return redirectResponse;
-        }
-
+        // if (response.status !== 200) {
+        //     const redirectResponse = NextResponse.redirect(new URL("/login", req.url));
+        //     redirectResponse.cookies.set("kanban-session-token", "", { expires: new Date(0), path: "/" });
+        //     return redirectResponse;
+        // }
 
         return NextResponse.next();
     } catch (error) {

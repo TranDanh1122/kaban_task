@@ -81,6 +81,28 @@ export const authOptions: NextAuthOptions = {
         strategy: "jwt",
     },
     callbacks: {
+        async signIn({ user, account }) {
+
+            if (account?.provider === "github") {
+                if (!user.email) return true
+                let existingUser = await prisma.user.findUnique({
+                    where: { email: user.email },
+                })
+
+                if (!existingUser) {
+                    existingUser = await prisma.user.create({
+                        data: {
+                            id: user.id,
+                            email: user.email,
+                            name: user.name,
+                            image: user.image,
+                        },
+                    })
+                }
+                user.id = existingUser.id
+            }
+            return true;
+        },
         async jwt({ token, user, account }: { token: JWT, user: User, account: any }) {
             if (user) token.user = {
                 id: user.id,
@@ -88,7 +110,10 @@ export const authOptions: NextAuthOptions = {
                 name: user.name,
                 image: user.image
             }
-            if (account) token.provider = account.provider
+            if (account)
+                token.provider = account.provider
+
+
             return token
         },
         async session({ session, token }: { session: Session, token: JWT }) {
@@ -125,3 +150,4 @@ export const authOptions: NextAuthOptions = {
     },
     secret: process.env.NEXTAUTH_SECRET
 }
+

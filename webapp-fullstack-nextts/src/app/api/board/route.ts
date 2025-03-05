@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
         if (!columns || columns.length <= 0 || !title) return NextResponse.json({ message: "Invalid Data" }, { status: 400 })
         const boards = await prisma.board.findMany({ where: { userId: token?.user?.id ?? "" } })
         const newSlug = createSlug(title, boards)
-        const board = await prisma.board.create({ data: { title: title, userId: token?.user?.id ?? "", slug: newSlug, Status: { create: columns } } })
+        const board = await prisma.board.create({ data: { title: title, userId: token?.user?.id ?? "", slug: newSlug, Status: { create: columns.map((col: any) => ({ name: col.name , color: col.color})) } } })
         if (!board) return NextResponse.json({ message: "Error when create Board" }, { status: 400 })
         return NextResponse.json({ data: board, message: "Create A Board Successfully" }, { status: 200 })
     } catch (error) {
